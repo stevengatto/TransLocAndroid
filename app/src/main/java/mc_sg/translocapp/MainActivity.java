@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
             List<Agency> agencies = listResponse.data;
             List<String> descriptions = new ArrayList<>();
 
+
             for(Agency agency : agencies) {
                 descriptions.add(agency.agencyId + " - " + agency.shortName);
             }
