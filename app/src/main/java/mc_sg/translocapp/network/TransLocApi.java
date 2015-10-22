@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import mc_sg.translocapp.model.Agency;
-import mc_sg.translocapp.model.AgencyRoutes;
+import mc_sg.translocapp.model.Route;
 import mc_sg.translocapp.model.ArrivalEstimate;
 import mc_sg.translocapp.model.Response;
 import retrofit.http.GET;
@@ -19,16 +19,16 @@ public interface TransLocApi {
     @GET("/agencies.json")
     void getAgencies(@Query("agencies") String agencies,
                      @Query("geo_area") String geo_area,
-                     NetworkUtil.RetroCallback<Response<List<Agency>>> callback);
+                     ApiUtil.RetroCallback<Response<List<Agency>>> callback);
 
     @GET("/arrival-estimates.json")
     void getArrivalEstimates(@Query("agencies") String agencies,
                              @Query("routes") String routes,
                              @Query("stops") String stops,
-                             NetworkUtil.RetroCallback<Response<List<ArrivalEstimate>>> callback);
+                             ApiUtil.RetroCallback<Response<List<ArrivalEstimate>>> callback);
 
     @GET("/routes.json")
     void getRoutes(@Query("agencies") String agencies,
                    @Query("geo_area") String geo_area,
-                   NetworkUtil.RetroCallback<Response<Map<String, ArrayList<AgencyRoutes>>>> callback);
+                   ApiUtil.RetroCallback<Response<Map<String, ArrayList<Route>>>> callback);
 }

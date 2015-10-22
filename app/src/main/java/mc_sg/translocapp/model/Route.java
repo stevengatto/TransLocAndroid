@@ -46,7 +46,7 @@ import java.util.ArrayList;
  *      ]
  *  }
  */
-public class AgencyRoutes {
+public class Route {
 
     public String description;
 

@@ -3,13 +3,18 @@ package mc_sg.translocapp.network;
 import android.content.Context;
 import android.widget.Toast;
 
+import java.util.List;
+
 import retrofit.Callback;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.RetrofitError;
 import retrofit.client.OkClient;
 
-public class NetworkUtil {
+/**
+ * Created by steven on 10/22/15.
+ */
+public class ApiUtil {
 
     /**
      * Trans Loc API base URL
@@ -81,6 +86,26 @@ public class NetworkUtil {
                     break;
             }
         }
+    }
+
+    public static String formatGeoArea(double northeastLat, double northeastLng, double southwestLat, double southwestLng) {
+        return northeastLat + "," + northeastLng + "|" + southwestLat + "," + southwestLng;
+    }
+
+    public static String formatAgencyList(List<Integer> agencyIds) {
+        if (agencyIds == null) {
+            return "";
+        }
+
+        String formattedList = "";
+        for (Integer id : agencyIds) {
+            formattedList += (id + ",");
+        }
+        // remove last comma
+        if (formattedList.endsWith(",")) {
+            formattedList = formattedList.substring(0, formattedList.length() - 1);
+        }
+        return formattedList;
     }
 
 }
