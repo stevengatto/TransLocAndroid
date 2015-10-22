@@ -40,6 +40,7 @@ public class NetworkUtil {
         RestAdapter restAdapter = new RestAdapter.Builder()
                 .setEndpoint(BASE_API_URL)
                 .setClient(new OkClient())
+                .setLogLevel(RestAdapter.LogLevel.FULL)
                 .setRequestInterceptor(requestInterceptor)
                 .build();
 
