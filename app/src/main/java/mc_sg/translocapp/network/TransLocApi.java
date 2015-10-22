@@ -1,20 +1,24 @@
 package mc_sg.translocapp.network;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import mc_sg.translocapp.model.Agency;
+import mc_sg.translocapp.model.AgencyRoutes;
 import mc_sg.translocapp.model.ArrivalEstimate;
 import mc_sg.translocapp.model.Response;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
 /**
- * Created by steven on 10/21/15.
+ * API to interact with the Trans Loc Api as a Java interface
  */
 public interface TransLocApi {
 
     @GET("/agencies.json")
-    void getAgencies(@Query("agencies") String agencies, @Query("geo_area") String geo_area,
+    void getAgencies(@Query("agencies") String agencies,
+                     @Query("geo_area") String geo_area,
                      NetworkUtil.RetroCallback<Response<List<Agency>>> callback);
 
     @GET("/arrival-estimates.json")
@@ -22,4 +26,9 @@ public interface TransLocApi {
                              @Query("routes") String routes,
                              @Query("stops") String stops,
                              NetworkUtil.RetroCallback<Response<List<ArrivalEstimate>>> callback);
+
+    @GET("/routes.json")
+    void getRoutes(@Query("agencies") String agencies,
+                   @Query("geo_area") String geo_area,
+                   NetworkUtil.RetroCallback<Response<Map<String, ArrayList<AgencyRoutes>>>> callback);
 }
