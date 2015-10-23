@@ -17,11 +17,10 @@ import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import mc_sg.translocapp.model.Agency;
+import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
-import mc_sg.translocapp.model.Route;
 import mc_sg.translocapp.network.ApiUtil;
 
 public class MainActivity extends AppCompatActivity  {
@@ -113,17 +112,17 @@ public class MainActivity extends AppCompatActivity  {
         }
     }
 
-    private class GetRoutesCallback extends ApiUtil.RetroCallback<Response<Map<String, ArrayList<Route>>>> {
+    private class GetRoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
 
         public GetRoutesCallback(Context context) {
             super(context);
         }
 
         @Override
-        public void success(Response<Map<String, ArrayList<Route>>> routesResponse, retrofit.client.Response response) {
+        public void success(Response<AgencyRouteMap> routesResponse, retrofit.client.Response response) {
             List<String> descriptions = new ArrayList<>();
             for(String key : routesResponse.data.keySet()) {
-                for (Route route : routesResponse.data.get(key)) {
+                for (AgencyRouteMap.Route route : routesResponse.data.get(key)) {
                     descriptions.add(route.agencyId + " - " + route.routeId + " - " + route.longName);
                 }
             }
