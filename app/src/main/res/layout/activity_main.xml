@@ -15,11 +15,10 @@
         android:layout_marginTop="20dp"
         android:text="Get Agencies"/>
 
-    <ListView
-        android:id="@+id/lv_response"
+    <FrameLayout
+        android:id="@+id/map_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/btn_get"
-        android:layout_marginTop="20dp"/>
+        android:layout_below="@id/btn_get"/>
 
 </RelativeLayout>

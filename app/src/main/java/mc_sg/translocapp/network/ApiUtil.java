@@ -3,6 +3,8 @@ package mc_sg.translocapp.network;
 import android.content.Context;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.VisibleRegion;
+
 import java.util.List;
 
 import retrofit.Callback;
@@ -88,8 +90,16 @@ public class ApiUtil {
         }
     }
 
-    public static String formatGeoArea(double northeastLat, double northeastLng, double southwestLat, double southwestLng) {
-        return northeastLat + "," + northeastLng + "|" + southwestLat + "," + southwestLng;
+    /**
+     * Get the formatted geo_area for the trans loc api from the visible region of
+     * a Google Map
+     *
+     * @param region Visible region of a Google Map
+     * @return Formatted string representing the bounding box visible on the map
+     */
+    public static String getGeoArea(VisibleRegion region) {
+        return region.farRight.latitude + "," + region.farRight.longitude + "|"
+                + region.nearLeft.latitude + "," + region.nearLeft.longitude;
     }
 
     public static String formatAgencyList(List<Integer> agencyIds) {

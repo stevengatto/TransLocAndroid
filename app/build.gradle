@@ -14,9 +14,9 @@ android {
     signingConfigs {
         release {
             storeFile file("keystore.jks")
-            storePassword System.console().readLine("\nKeystore password: ")
+            storePassword System.console() != null ? System.console().readLine("\nKeystore password: ") : ""
             keyAlias "transloc_key"
-            keyPassword System.console().readLine("\nKey password: ")
+            keyPassword System.console() != null ? System.console().readLine("\nKey password: ") : ""
         }
     }
     buildTypes {
