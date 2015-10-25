@@ -4,9 +4,11 @@ import java.util.List;
 
 import mc_sg.translocapp.model.Agency;
 import mc_sg.translocapp.model.AgencyRouteMap;
+import mc_sg.translocapp.model.AgencyVehicleMap;
 import mc_sg.translocapp.model.ArrivalEstimate;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.model.SegmentMap;
+import mc_sg.translocapp.model.Stop;
 import retrofit.http.GET;
 import retrofit.http.Query;
 
@@ -36,4 +38,16 @@ public interface TransLocApi {
                      @Query("geo_area") String geo_area,
                      @Query("routes") String routes,
                      ApiUtil.RetroCallback<Response<SegmentMap>> callback);
+
+    @GET("/stops.json")
+    void getStops(@Query("agencies") String agencies,
+                  @Query("geo_area") String geo_area,
+                  ApiUtil.RetroCallback<Response<List<Stop>>> callback);
+
+    @GET("/vehicles.json")
+    void getVehicles(@Query("agencies") String agencies,
+                     @Query("geo_area") String geo_area,
+                     @Query("routes") String routes,
+                     ApiUtil.RetroCallback<Response<AgencyVehicleMap>> callback);
+
 }
