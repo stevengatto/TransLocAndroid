@@ -15,10 +15,16 @@
         android:layout_marginTop="20dp"
         android:text="Get Agencies"/>
 
-    <FrameLayout
-        android:id="@+id/map_frame"
+    <mc_sg.translocapp.view.MapWrapperLayout
+        android:id="@+id/map_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/btn_get"/>
+        android:layout_height="match_parent">
+
+        <FrameLayout
+            android:id="@+id/map_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </mc_sg.translocapp.view.MapWrapperLayout>
 
 </RelativeLayout>
