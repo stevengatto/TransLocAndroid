@@ -3,7 +3,7 @@
     package="mc_sg.translocapp" >
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="true"
@@ -23,8 +23,13 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyC587x7oUC2JmHtXVqFjjzJ11Fo_b6CGKc"/>
+            android:value="AIzaSyC587x7oUC2JmHtXVqFjjzJ11Fo_b6CGKc" />
 
+        <activity
+            android:name=".RoutesActivity"
+            android:label="@string/title_activity_routes"
+            android:theme="@style/AppTheme.NoActionBar" >
+        </activity>
     </application>
 
 </manifest>
