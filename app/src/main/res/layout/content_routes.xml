@@ -12,8 +12,16 @@
     <ExpandableListView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/expandableListView"
+        android:id="@+id/routes_listview"
         android:layout_centerHorizontal="true"
         android:layout_alignParentTop="true" />
+
+    <mc_sg.translocapp.view.ProgressCard
+        android:id="@+id/routes_list_progress_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        android:text="Loading routes..."/>
 
 </RelativeLayout>

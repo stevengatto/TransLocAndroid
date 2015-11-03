@@ -39,11 +39,11 @@ public class MapWrapperLayout extends RelativeLayout {
     private View infoWindow;
 
     public MapWrapperLayout(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public MapWrapperLayout(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public MapWrapperLayout(Context context, AttributeSet attrs, int defStyle) {

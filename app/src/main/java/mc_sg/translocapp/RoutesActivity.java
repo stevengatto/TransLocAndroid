@@ -24,10 +24,13 @@ import java.util.List;
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
+import mc_sg.translocapp.view.ProgressCard;
+import retrofit.RetrofitError;
 
 public class RoutesActivity extends AppCompatActivity {
 
     private ExpandableListView expandableListView;
+    private View listProgress;
     private String agencyId;
 
     @Override
@@ -50,7 +53,10 @@ public class RoutesActivity extends AppCompatActivity {
         ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(this));
 
         // R aggregates xml data to interface with.
-        expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
+        expandableListView = (ExpandableListView) findViewById(R.id.routes_listview);
+        expandableListView.setGroupIndicator(null);
+
+        listProgress = findViewById(R.id.routes_list_progress_card);
     }
 
     private class RoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
@@ -62,7 +68,14 @@ public class RoutesActivity extends AppCompatActivity {
         }
 
         @Override
+        public void failure(RetrofitError retrofitError) {
+            super.failure(retrofitError);
+            listProgress.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         public void success(Response<AgencyRouteMap> agencyRouteMapResponse, retrofit.client.Response response) {
+            listProgress.setVisibility(View.INVISIBLE);
             List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
 
             List<AgencyRouteMap.Route> activeRoutes = new ArrayList<>();
