@@ -6,15 +6,6 @@
     android:layout_height="match_parent"
     android:background="@android:color/darker_gray">
 
-    <Button
-        android:id="@+id/btn_get"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="20dp"
-        android:text="Get Agencies"/>
-
     <mc_sg.translocapp.view.MapWrapperLayout
         android:id="@+id/map_wrapper"
         android:layout_width="match_parent"
@@ -26,6 +17,18 @@
             android:layout_height="match_parent"/>
 
     </mc_sg.translocapp.view.MapWrapperLayout>
+
+    <TextView
+        android:id="@+id/map_text_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:padding="16dp"
+        android:background="#C0FFFFFF"
+        android:textColor="#343434"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:text="Select your home agency"/>
 
 </RelativeLayout>
 

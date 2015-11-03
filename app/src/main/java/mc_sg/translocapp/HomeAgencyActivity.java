@@ -48,6 +48,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     private MapWrapperLayout.OnInfoWindowElemTouchListener infoWindowListener;
     private Location lastLocation;
     private List<Agency> agencyList;
+    private Integer mapBottomPadding = null;
     private boolean mapInitialized = false;
 
     @Override
@@ -68,21 +69,20 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         infoWindowListener = new OnSetHomeClicked(infoButton);
         infoButton.setOnTouchListener(infoWindowListener);
 
-        Button btnGet = (Button) findViewById(R.id.btn_get);
-        btnGet.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String geoArea = null;
-                if (map != null) {
-                    geoArea = ApiUtil.getGeoArea(map.getProjection().getVisibleRegion());
-                }
-                ApiUtil.getTransLocApi().getAgencies(null, geoArea, new GetAgenciesCallback(context));
-            }
-        });
-
         MapFragment mapFragment = new MapFragment();
         getFragmentManager().beginTransaction().replace(R.id.map_frame, mapFragment).commit();
         mapFragment.getMapAsync(this);
+
+        final View textOverlay = findViewById(R.id.map_text_overlay);
+        textOverlay.post(new Runnable() {
+            @Override
+            public void run() {
+                mapBottomPadding = textOverlay.getHeight();
+                if (map != null) {
+                    map.setPadding(0, 0, 0, mapBottomPadding);
+                }
+            }
+        });
     }
 
     @Override
@@ -114,6 +114,11 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         map = googleMap;
         map.setMyLocationEnabled(true);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+
+        if (mapBottomPadding != null) {
+            map.setPadding(0, 0, 0, mapBottomPadding);
+        }
+
         initMapPosition();
 
         mapWrapper.init(map, getPixelsFromDp(this, 39 + 20));
@@ -144,7 +149,16 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             mapInitialized = true;
+            getAgencies();
         }
+    }
+
+    public void getAgencies() {
+        String geoArea = null;
+        if (map != null) {
+            geoArea = ApiUtil.getGeoArea(map.getProjection().getVisibleRegion());
+        }
+        ApiUtil.getTransLocApi().getAgencies(null, geoArea, new GetAgenciesCallback(context));
     }
 
     public static int getPixelsFromDp(Context context, float dp) {
