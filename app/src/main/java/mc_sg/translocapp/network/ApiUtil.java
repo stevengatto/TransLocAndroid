@@ -73,20 +73,22 @@ public class ApiUtil {
          */
         @Override
         public void failure(RetrofitError retrofitError) {
+            String errorMsg = "An error has occurred";
             switch(retrofitError.getKind()) {
                 case HTTP:
-                    Toast.makeText(context, "Error: " + retrofitError.getResponse().getStatus(), Toast.LENGTH_LONG);
+                    errorMsg = "Error: " + retrofitError.getResponse().getStatus();
                     break;
                 case CONVERSION:
-                    Toast.makeText(context, "Conversion Error", Toast.LENGTH_LONG);
+                    errorMsg = "Conversion Error";
                     break;
                 case NETWORK:
-                    Toast.makeText(context, "Network Error", Toast.LENGTH_LONG);
+                    errorMsg = "Network Error";
                     break;
                 case UNEXPECTED:
-                    Toast.makeText(context, "Unexpected Error", Toast.LENGTH_LONG);
+                    errorMsg = "Unexpected Error";
                     break;
             }
+            Toast.makeText(context, errorMsg, Toast.LENGTH_LONG).show();
         }
     }
 

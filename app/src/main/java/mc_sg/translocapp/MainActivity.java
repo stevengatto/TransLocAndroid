@@ -5,12 +5,9 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -43,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView infoTitle;
     private TextView infoSnippet;
     private Button infoButton;
-    private View.OnTouchListener infoWindowListener;
+    private MapWrapperLayout.OnInfoWindowElemTouchListener infoWindowListener;
     private boolean mapInitialized = false;
 
     @Override
@@ -56,16 +53,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         // We want to reuse the info window for all the markers,
         // so let's create only one class member instance
         mapWrapper = (MapWrapperLayout) findViewById(R.id.map_wrapper);
-        infoWindow = (ViewGroup)getLayoutInflater().inflate(R.layout.view_map_info_window, null);
-        infoTitle = (TextView) infoWindow.findViewById(R.id.title);
-        infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
-        infoButton = (Button) infoWindow.findViewById(R.id.button);
-        infoButton.setOnClickListener(new View.OnClickListener() {
+        infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.view_map_info_window, null);
+        infoTitle = (TextView) infoWindow.findViewById(R.id.info_title);
+        infoSnippet = (TextView) infoWindow.findViewById(R.id.info_snippet);
+        infoButton = (Button) infoWindow.findViewById(R.id.info_button);
+
+        infoWindowListener = new MapWrapperLayout.OnInfoWindowElemTouchListener(infoButton) {
             @Override
-            public void onClick(View v) {
-                Log.d(null, "marker button clicked");
+            protected void onClickConfirmed(View v, Marker marker) {
+                Toast.makeText(context, "Button clicked with title " + marker.getTitle(), Toast.LENGTH_LONG).show();
             }
-        });
+        };
+
+        infoButton.setOnTouchListener(infoWindowListener);
 
         Button btnGet = (Button) findViewById(R.id.btn_get);
         btnGet.setOnClickListener(new View.OnClickListener() {
@@ -124,6 +124,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 // We must call this to set the current marker and infoWindow references
                 // to the MapWrapperLayout
                 mapWrapper.setMarkerWithInfoWindow(marker, infoWindow);
+                infoWindowListener.setMarker(marker);
+
                 return infoWindow;
             }
         });
@@ -178,9 +180,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (!agencies.isEmpty()) {
                     for (Agency agency : agencies) {
                         map.addMarker(new MarkerOptions()
-                                        .snippet(agency.shortName)
-                                        .title(agency.longName)
-                                        .position(new LatLng(agency.position.lat, agency.position.lng))
+                            .title(agency.shortName)
+                            .position(new LatLng(agency.position.lat, agency.position.lng))
                         );
                     }
                 } else {
@@ -189,26 +190,4 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         }
     }
-
-//    private class GetRoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
-//
-//        public GetRoutesCallback(Context context) {
-//            super(context);
-//        }
-//
-//        @Override
-//        public void success(Response<AgencyRouteMap> routesResponse, retrofit.client.Response response) {
-//            List<String> descriptions = new ArrayList<>();
-//            for(String key : routesResponse.data.keySet()) {
-//                for (AgencyRouteMap.Route route : routesResponse.data.get(key)) {
-//                    descriptions.add(route.agencyId + " - " + route.routeId + " - " + route.longName);
-//                }
-//            }
-//
-//            ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(),
-//                    android.R.layout.simple_list_item_1, descriptions);
-//
-//            responseList.setAdapter(adapter);
-//        }
-//    }
 }
