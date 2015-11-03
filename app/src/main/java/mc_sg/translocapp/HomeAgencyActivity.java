@@ -83,6 +83,13 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                 }
             }
         });
+
+        findViewById(R.id.map_get_agencies).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAgencies();
+            }
+        });
     }
 
     @Override
