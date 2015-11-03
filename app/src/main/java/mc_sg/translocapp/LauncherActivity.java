@@ -15,7 +15,7 @@ public class LauncherActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         SharedPreferences prefs = getSharedPreferences(HomeAgencyActivity.PREFS_HOME_AGENCY, MODE_PRIVATE);
-        String agencyId = prefs.getString(HomeAgencyActivity.KEY_HOME_AGENCY_ID, null);
+        String agencyId = prefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_ID, null);
         if (agencyId != null) {
             // launch list activity with param of agency id
             Intent routesIntent = new Intent(this, RoutesActivity.class);

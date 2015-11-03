@@ -1,53 +1,56 @@
 package mc_sg.translocapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.DataSetObservable;
 import android.database.DataSetObserver;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.amulyakhare.textdrawable.TextDrawable;
+import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import mc_sg.translocapp.model.Agency;
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
 
 public class RoutesActivity extends AppCompatActivity {
 
-    private static final String AGENCY_ID = "243";
-
     private ExpandableListView expandableListView;
+    private String agencyId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_routes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Routes");
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-        ApiUtil.getTransLocApi().getRoutes(AGENCY_ID, null, new RoutesCallback(this));
+        // get agency id from bundle or shared prefs
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            agencyId = extras.getString(LauncherActivity.KEY_AGENCY_ID);
+        } else {
+            SharedPreferences prefs = getSharedPreferences(HomeAgencyActivity.PREFS_HOME_AGENCY, MODE_PRIVATE);
+            agencyId = prefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_ID, null);
+        }
+
+        ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(this));
 
         // R aggregates xml data to interface with.
         expandableListView = (ExpandableListView) findViewById(R.id.expandableListView);
-
     }
 
     private class RoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
@@ -60,12 +63,20 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public void success(Response<AgencyRouteMap> agencyRouteMapResponse, retrofit.client.Response response) {
-            List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(AGENCY_ID);
-            expandableListView.setAdapter(new RouteAdapter(context, 0, 0, 0, routes));
+            List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
+
+            List<AgencyRouteMap.Route> activeRoutes = new ArrayList<>();
+            for (AgencyRouteMap.Route route : routes) {
+                if (route.isActive) {
+                    activeRoutes.add(route);
+                }
+            }
+
+            expandableListView.setAdapter(new RouteAdapter(context, 0, 0, 0, activeRoutes));
         }
     }
 
-    private class RouteAdapter implements ExpandableListAdapter {
+    private class RouteAdapter extends BaseExpandableListAdapter {
 
         private final List<AgencyRouteMap.Route> routes;
 
@@ -141,8 +152,31 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
+            GroupHolder holder;
+            if (convertView == null) {
+                convertView = inflater.inflate(R.layout.item_route_list, parent, false);
 
-            convertView = inflater.inflate(isExpanded ? getGroupExpandedView() : getGroupClosedView(), parent, false);
+                holder = new GroupHolder();
+                holder.title = (TextView) convertView.findViewById(R.id.item_route_list_title);
+                holder.desc = (TextView) convertView.findViewById(R.id.item_route_list_desc);
+                holder.icon = (ImageView) convertView.findViewById(R.id.item_route_list_icon);
+
+                convertView.setTag(holder);
+            }
+
+            holder = (GroupHolder) convertView.getTag();
+            AgencyRouteMap.Route currentRoute = routes.get(groupPosition);
+
+            if (currentRoute.shortName == null || currentRoute.shortName.isEmpty()) {
+                holder.title.setText(currentRoute.longName);
+            } else {
+                holder.title.setText(currentRoute.shortName);
+            }
+
+            holder.desc.setText(currentRoute.stops.size() + " stops");
+
+            TextDrawable icon = TextDrawable.builder().buildRound((""+(groupPosition+1)), ColorGenerator.MATERIAL.getColor(groupPosition));
+            holder.icon.setImageDrawable(icon);
             return convertView;
         }
 
@@ -200,6 +234,12 @@ public class RoutesActivity extends AppCompatActivity {
 
         public Integer getGroupClosedView() {
             return groupClosedView;
+        }
+
+        private class GroupHolder {
+            TextView title;
+            TextView desc;
+            ImageView icon;
         }
     }
 

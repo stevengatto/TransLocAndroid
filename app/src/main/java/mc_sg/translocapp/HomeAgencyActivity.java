@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -30,7 +31,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 
 import mc_sg.translocapp.model.Agency;
-import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.MapWrapperLayout;
@@ -38,7 +38,7 @@ import mc_sg.translocapp.view.MapWrapperLayout;
 public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     public static final String PREFS_HOME_AGENCY = "home_agency_prefs"; // key for sharedprefs
-    public static final String KEY_HOME_AGENCY_ID = "key_home_agency_id"; // key for id in sharedprefs
+    public static final String KEY_PREFS_AGENCY_ID = "key_home_agency_id"; // key for id in sharedprefs
 
     private Activity context;
     private GoogleApiClient mGoogleApiClient;
@@ -56,7 +56,11 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_home_agency);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Agencies");
+        setSupportActionBar(toolbar);
+
         context = this;
         buildGoogleApiClient();
 
@@ -227,7 +231,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                                     // update the users preferences when they set a home agency
                                     SharedPreferences prefs = context.getSharedPreferences(PREFS_HOME_AGENCY, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = prefs.edit();
-                                    editor.putString(KEY_HOME_AGENCY_ID, homeAgency.agencyId);
+                                    editor.putString(KEY_PREFS_AGENCY_ID, homeAgency.agencyId);
                                     editor.apply();
                                     startActivity(new Intent(context, RoutesActivity.class));
                                     break;
