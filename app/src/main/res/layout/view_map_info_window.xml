@@ -4,11 +4,19 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical" >
 
+    <Button
+        android:id="@+id/info_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Set As\nHome" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:orientation="vertical"
-        android:layout_marginRight="10dp" >
+        android:layout_marginStart="10dp"
+        android:layout_marginLeft="10dp" >
 
         <TextView
             android:id="@+id/info_title"
@@ -17,18 +25,6 @@
             android:textSize="18sp"
             android:text="Title" />
 
-        <TextView
-            android:id="@+id/info_snippet"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="snippet" />
-
     </LinearLayout>
-
-    <Button
-        android:id="@+id/info_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Set As\nHome" />
 
 </LinearLayout>

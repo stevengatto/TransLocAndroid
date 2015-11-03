@@ -1,11 +1,13 @@
 package mc_sg.translocapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,7 +33,10 @@ import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.MapWrapperLayout;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyCallback {
+
+    public static final String PREFS_HOME_AGENCY = "home_agency_prefs"; // key for sharedprefs
+    public static final String KEY_HOME_AGENCY_ID = "key_home_agency_id"; // key for id in sharedprefs
 
     private Activity context;
     private GoogleApiClient mGoogleApiClient;
@@ -39,10 +44,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private MapWrapperLayout mapWrapper;
     private ViewGroup infoWindow;
     private TextView infoTitle;
-    private TextView infoSnippet;
     private Button infoButton;
     private MapWrapperLayout.OnInfoWindowElemTouchListener infoWindowListener;
     private Location lastLocation;
+    private List<Agency> agencyList;
     private boolean mapInitialized = false;
 
     @Override
@@ -57,16 +62,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapWrapper = (MapWrapperLayout) findViewById(R.id.map_wrapper);
         infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.view_map_info_window, null);
         infoTitle = (TextView) infoWindow.findViewById(R.id.info_title);
-        infoSnippet = (TextView) infoWindow.findViewById(R.id.info_snippet);
         infoButton = (Button) infoWindow.findViewById(R.id.info_button);
 
-        infoWindowListener = new MapWrapperLayout.OnInfoWindowElemTouchListener(infoButton) {
-            @Override
-            protected void onClickConfirmed(View v, Marker marker) {
-                Toast.makeText(context, "Button clicked with title " + marker.getTitle(), Toast.LENGTH_LONG).show();
-            }
-        };
-
+        // set up map marker listeners
+        infoWindowListener = new OnSetHomeClicked(infoButton);
         infoButton.setOnTouchListener(infoWindowListener);
 
         Button btnGet = (Button) findViewById(R.id.btn_get);
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             public View getInfoContents(Marker marker) {
                 // Setting up the infoWindow with current's marker info
                 infoTitle.setText(marker.getTitle());
-                infoSnippet.setText(marker.getSnippet());
 
                 // We must call this to set the current marker and infoWindow references
                 // to the MapWrapperLayout
@@ -175,6 +173,59 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    private class OnSetHomeClicked extends MapWrapperLayout.OnInfoWindowElemTouchListener {
+
+        public OnSetHomeClicked(View view) {
+            super(view);
+        }
+
+        @Override
+        protected void onClickConfirmed(View v, Marker marker) {
+            if (v.getId() == infoButton.getId()) {
+                String agencyName = marker.getTitle();
+                Agency foundAgency = null;
+                // linear search, inefficient I know
+                for (Agency agency : agencyList) {
+                    if (agency.shortName.equals(agencyName)) {
+                        foundAgency = agency;
+                        break;
+                    }
+                }
+
+                final Agency homeAgency = foundAgency; // hack to get final variable in inner class
+                DialogInterface.OnClickListener dialogClickListener = null;
+                if (homeAgency != null) {
+                    // show a dialog just to be sure
+                    dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            switch (which) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    // update the users preferences when they set a home agency
+                                    SharedPreferences prefs = context.getSharedPreferences(PREFS_HOME_AGENCY, Context.MODE_PRIVATE);
+                                    SharedPreferences.Editor editor = prefs.edit();
+                                    editor.putString(KEY_HOME_AGENCY_ID, homeAgency.agencyId);
+                                    editor.apply();
+                                    break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    // Do nothing
+                                    break;
+                            }
+                        }
+                    };
+                }
+
+                String message = "Are you sure you want to set " + marker.getTitle()
+                        + " as your home agency?";
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage(message)
+                        .setPositiveButton("Yes", dialogClickListener)
+                        .setNegativeButton("No", dialogClickListener)
+                        .show();
+            }
+        }
+    }
+
     private class GetAgenciesCallback extends ApiUtil.RetroCallback<Response<List<Agency>>> {
 
         public GetAgenciesCallback(Context context) {
@@ -185,9 +236,9 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         public void success(Response<List<Agency>> listResponse, retrofit.client.Response response) {
             if (map != null) {
                 map.clear();
-                List<Agency> agencies = listResponse.data;
-                if (!agencies.isEmpty()) {
-                    for (Agency agency : agencies) {
+                agencyList = listResponse.data;
+                if (!agencyList.isEmpty()) {
+                    for (Agency agency : agencyList) {
                         map.addMarker(new MarkerOptions()
                             .title(agency.shortName)
                             .position(new LatLng(agency.position.lat, agency.position.lng))
