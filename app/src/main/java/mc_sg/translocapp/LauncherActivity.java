@@ -21,6 +21,8 @@ public class LauncherActivity extends Activity {
             Intent routesIntent = new Intent(this, RoutesActivity.class);
             Bundle data = new Bundle();
             data.putString(KEY_AGENCY_ID, agencyId);
+            routesIntent.putExtras(data);
+            startActivity(routesIntent);
         } else {
             Intent mapIntent = new Intent(this, HomeAgencyActivity.class);
             startActivity(mapIntent);

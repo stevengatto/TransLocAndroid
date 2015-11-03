@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.location.Location;
 import android.os.Bundle;
@@ -29,6 +30,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.util.List;
 
 import mc_sg.translocapp.model.Agency;
+import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.MapWrapperLayout;
@@ -227,6 +229,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putString(KEY_HOME_AGENCY_ID, homeAgency.agencyId);
                                     editor.apply();
+                                    startActivity(new Intent(context, RoutesActivity.class));
                                     break;
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     // Do nothing
