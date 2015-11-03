@@ -5,6 +5,7 @@ import android.content.Context;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     private TextView infoSnippet;
     private Button infoButton;
     private MapWrapperLayout.OnInfoWindowElemTouchListener infoWindowListener;
+    private Location lastLocation;
     private boolean mapInitialized = false;
 
     @Override
@@ -84,6 +86,20 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        if (mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
     protected synchronized void buildGoogleApiClient() {
         GoogleApiConnectionCallbacks callback = new GoogleApiConnectionCallbacks();
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -93,13 +109,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 .build();
     }
 
-    private Location getLastLocation() {
-        Location location = null;
-        if (mGoogleApiClient.isConnected()) {
-            location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
-        }
-        return location;
-    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -132,10 +141,10 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     private void initMapPosition() {
-        Location lastLocation = getLastLocation();
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (lastLocation != null && map != null && !mapInitialized) {
             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
             mapInitialized = true;
         }
     }
