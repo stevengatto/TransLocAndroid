@@ -139,6 +139,8 @@ public class RoutesActivity extends AppCompatActivity {
         private final List<AgencyRouteMap.Route> routes;
         private final Context context;
 
+        Map<Integer, Integer> colorMap = new HashMap<>();
+
         public RouteAdapter(Context context, List<AgencyRouteMap.Route> routes, Map<String, SegmentMap> segments) {
             this.routes = routes;
             this.context = context;
@@ -178,14 +180,19 @@ public class RoutesActivity extends AppCompatActivity {
             }
             routeView.setDesc(currentRoute.stops.size() + " stops");
 
-            // TODO: Add lookup table once color has been set
             Random random = new Random(position); // seed so views keep the same color
             int currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
 
             // make sure we get a dark color for the polyline
-            while (!isColorDark(currentColor)) {
-                currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
+            if (colorMap.get(position) == null) {
+                while (!isColorDark(currentColor)) {
+                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
+                }
+                colorMap.put(position, currentColor);
+            } else {
+                currentColor = colorMap.get(position);
             }
+
 
             TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), currentColor);
             routeView.setIconImageDrawable(icon);
