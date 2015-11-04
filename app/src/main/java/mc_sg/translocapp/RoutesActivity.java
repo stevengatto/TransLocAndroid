@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
@@ -177,7 +178,15 @@ public class RoutesActivity extends AppCompatActivity {
             }
             routeView.setDesc(currentRoute.stops.size() + " stops");
 
-            int currentColor = ColorGenerator.MATERIAL.getColor(position*10);
+            // TODO: Add lookup table once color has been set
+            Random random = new Random(position); // seed so views keep the same color
+            int currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
+
+            // make sure we get a dark color for the polyline
+            while (!isColorDark(currentColor)) {
+                currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
+            }
+
             TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), currentColor);
             routeView.setIconImageDrawable(icon);
 
@@ -194,6 +203,11 @@ public class RoutesActivity extends AppCompatActivity {
         @Override
         public boolean isEmpty() {
             return getRoutes().isEmpty();
+        }
+
+        public boolean isColorDark(int color){
+            double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
+            return darkness >= 0.2;
         }
     }
 
