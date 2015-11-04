@@ -2,18 +2,15 @@ package mc_sg.translocapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.DataSetObservable;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.ExpandableListView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
 
 import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
@@ -24,18 +21,22 @@ import java.util.List;
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
-import mc_sg.translocapp.view.ProgressCard;
+import mc_sg.translocapp.view.RouteListItem;
 import retrofit.RetrofitError;
 
 public class RoutesActivity extends AppCompatActivity {
 
-    private ExpandableListView expandableListView;
+    private ListView listView;
     private View listProgress;
     private String agencyId;
+    private Context context;
+
+    private List<AgencyRouteMap.Route> activeRoutes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = this;
         setContentView(R.layout.activity_routes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Routes");
@@ -53,10 +54,16 @@ public class RoutesActivity extends AppCompatActivity {
         ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(this));
 
         // R aggregates xml data to interface with.
-        expandableListView = (ExpandableListView) findViewById(R.id.routes_listview);
-        expandableListView.setGroupIndicator(null);
-
+        listView = (ListView) findViewById(R.id.routes_listview);
+        listView.setOnItemClickListener(new OnRouteClick());
         listProgress = findViewById(R.id.routes_list_progress_card);
+    }
+
+    private class OnRouteClick implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            Toast.makeText(context, "Route " + activeRoutes.get(position).routeId + " clicked", Toast.LENGTH_LONG).show();
+        }
     }
 
     private class RoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
@@ -78,40 +85,24 @@ public class RoutesActivity extends AppCompatActivity {
             listProgress.setVisibility(View.INVISIBLE);
             List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
 
-            List<AgencyRouteMap.Route> activeRoutes = new ArrayList<>();
+            activeRoutes = new ArrayList<>();
             for (AgencyRouteMap.Route route : routes) {
                 if (route.isActive) {
                     activeRoutes.add(route);
                 }
             }
-
-            expandableListView.setAdapter(new RouteAdapter(context, 0, 0, 0, activeRoutes));
+            listView.setAdapter(new RouteAdapter(context, activeRoutes));
         }
     }
 
-    private class RouteAdapter extends BaseExpandableListAdapter {
+    private class RouteAdapter extends BaseAdapter {
 
         private final List<AgencyRouteMap.Route> routes;
-
         private final Context context;
 
-        private final DataSetObservable dataSetObservable = new DataSetObservable();
-
-        private final LayoutInflater inflater;
-
-        private final Integer groupExpandedView;
-
-        private final Integer childView;
-
-        private final Integer groupClosedView;
-
-        public RouteAdapter(Context context, int groupClosedView, int groupExpandedView, int childView, List<AgencyRouteMap.Route> routes) {
+        public RouteAdapter(Context context, List<AgencyRouteMap.Route> routes) {
             this.routes = routes;
             this.context = context;
-            this.groupExpandedView = groupExpandedView;
-            this.childView = childView;
-            this.groupClosedView = groupClosedView;
-            this.inflater = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
 
         protected List<AgencyRouteMap.Route> getRoutes() {
@@ -119,140 +110,47 @@ public class RoutesActivity extends AppCompatActivity {
         }
 
         @Override
-        public void registerDataSetObserver(DataSetObserver observer) {
-            this.getDataSetObservable().registerObserver(observer);
-        }
-
-        @Override
-        public void unregisterDataSetObserver(DataSetObserver observer) {
-            this.getDataSetObservable().unregisterObserver(observer);
-        }
-
-        @Override
-        public int getGroupCount() {
+        public int getCount() {
             return getRoutes().size();
         }
 
         @Override
-        public int getChildrenCount(int groupPosition) {
-            return 0;
+        public Object getItem(int position) {
+            return getRoutes().get(position);
         }
 
         @Override
-        public Object getGroup(int groupPosition) {
-            return null;
+        public long getItemId(int position) {
+            return position;
         }
 
         @Override
-        public Object getChild(int groupPosition, int childPosition) {
-            return null;
-        }
-
-        @Override
-        public long getGroupId(int groupPosition) {
-            return 0;
-        }
-
-        @Override
-        public long getChildId(int groupPosition, int childPosition) {
-            return 0;
-        }
-
-        @Override
-        public boolean hasStableIds() {
-            return false;
-        }
-
-        @Override
-        public View getGroupView(int groupPosition, boolean isExpanded, View convertView, ViewGroup parent) {
-            GroupHolder holder;
+        public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = inflater.inflate(R.layout.item_route_list, parent, false);
-
-                holder = new GroupHolder();
-                holder.title = (TextView) convertView.findViewById(R.id.item_route_list_title);
-                holder.desc = (TextView) convertView.findViewById(R.id.item_route_list_desc);
-                holder.icon = (ImageView) convertView.findViewById(R.id.item_route_list_icon);
-
-                convertView.setTag(holder);
+                convertView = new RouteListItem(context, position);
             }
-
-            holder = (GroupHolder) convertView.getTag();
-            AgencyRouteMap.Route currentRoute = routes.get(groupPosition);
+            RouteListItem routeView = (RouteListItem) convertView;
+            AgencyRouteMap.Route currentRoute = routes.get(position);
 
             if (currentRoute.shortName == null || currentRoute.shortName.isEmpty()) {
-                holder.title.setText(currentRoute.longName);
+                routeView.setTitle(currentRoute.longName);
             } else {
-                holder.title.setText(currentRoute.shortName);
+                routeView.setTitle(currentRoute.shortName);
             }
-
-            holder.desc.setText(currentRoute.stops.size() + " stops");
-
-            TextDrawable icon = TextDrawable.builder().buildRound((""+(groupPosition+1)), ColorGenerator.MATERIAL.getColor(groupPosition));
-            holder.icon.setImageDrawable(icon);
-            return convertView;
-        }
-
-        @Override
-        public View getChildView(int groupPosition, int childPosition, boolean isLastChild, View convertView, ViewGroup parent) {
-            return null;
-        }
-
-        @Override
-        public boolean isChildSelectable(int groupPosition, int childPosition) {
-            return false;
+            routeView.setDesc(currentRoute.stops.size() + " stops");
+            TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), ColorGenerator.MATERIAL.getColor(position*10));
+            routeView.setIconImageDrawable(icon);
+            return routeView;
         }
 
         @Override
         public boolean areAllItemsEnabled() {
-            return false;
+            return true;
         }
 
         @Override
         public boolean isEmpty() {
             return getRoutes().isEmpty();
-        }
-
-        @Override
-        public void onGroupExpanded(int groupPosition) {
-
-        }
-
-        @Override
-        public void onGroupCollapsed(int groupPosition) {
-
-        }
-
-        @Override
-        public long getCombinedChildId(long groupId, long childId) {
-            return 0;
-        }
-
-        @Override
-        public long getCombinedGroupId(long groupId) {
-            return 0;
-        }
-
-        public DataSetObservable getDataSetObservable() {
-            return dataSetObservable;
-        }
-
-        public Integer getGroupExpandedView() {
-            return groupExpandedView;
-        }
-
-        public Integer getChildView() {
-            return childView;
-        }
-
-        public Integer getGroupClosedView() {
-            return groupClosedView;
-        }
-
-        private class GroupHolder {
-            TextView title;
-            TextView desc;
-            ImageView icon;
         }
     }
 

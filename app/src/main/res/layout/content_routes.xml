@@ -9,12 +9,13 @@
     tools:showIn="@layout/activity_routes"
     tools:context="mc_sg.translocapp.RoutesActivity">
 
-    <ExpandableListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:id="@+id/routes_listview"
         android:layout_centerHorizontal="true"
-        android:layout_alignParentTop="true" />
+        android:layout_alignParentTop="true"
+        android:divider="@null" />
 
     <mc_sg.translocapp.view.ProgressCard
         android:id="@+id/routes_list_progress_card"
@@ -22,6 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="100dp"
-        android:text="Loading routes..."/>
+        app:text="Loading routes..."/>
 
 </RelativeLayout>

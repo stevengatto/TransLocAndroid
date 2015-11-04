@@ -41,6 +41,7 @@ dependencies {
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
 
     compile 'com.google.android.gms:play-services:8.1.0'
+    compile 'com.google.maps.android:android-maps-utils:0.4'
 
     compile 'com.amulyakhare:com.amulyakhare.textdrawable:1.0.1'
 }
