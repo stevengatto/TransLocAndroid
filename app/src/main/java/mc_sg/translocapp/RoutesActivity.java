@@ -16,15 +16,21 @@ import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
+import mc_sg.translocapp.model.SegmentMap;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.RouteListItem;
 import retrofit.RetrofitError;
 
 public class RoutesActivity extends AppCompatActivity {
+
+    private int segmentsReceived = 0;
+    private Map<String, SegmentMap> activeSegments = new HashMap<>();
 
     private ListView listView;
     private View listProgress;
@@ -77,21 +83,52 @@ public class RoutesActivity extends AppCompatActivity {
         @Override
         public void failure(RetrofitError retrofitError) {
             super.failure(retrofitError);
-            listProgress.setVisibility(View.INVISIBLE);
+            Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
+            // retry here
         }
 
         @Override
         public void success(Response<AgencyRouteMap> agencyRouteMapResponse, retrofit.client.Response response) {
-            listProgress.setVisibility(View.INVISIBLE);
-            List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
 
+            List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
             activeRoutes = new ArrayList<>();
+
             for (AgencyRouteMap.Route route : routes) {
                 if (route.isActive) {
                     activeRoutes.add(route);
+                    ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
+                            new SegmentsCallback(context, route.routeId));
                 }
             }
-            listView.setAdapter(new RouteAdapter(context, activeRoutes));
+        }
+    }
+
+    private class SegmentsCallback extends ApiUtil.RetroCallback<Response<SegmentMap>> {
+
+        String routeId;
+
+        public SegmentsCallback(Context context, String routeId) {
+            // maybe change put route id here to retry with
+            super(context);
+            this.routeId = routeId;
+        }
+
+        @Override
+        public void failure(RetrofitError retrofitError) {
+            super.failure(retrofitError);
+            Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
+            // retry
+        }
+
+        @Override
+        public void success(Response<SegmentMap> segmentMapResponse, retrofit.client.Response response) {
+            segmentsReceived += 1;
+            activeSegments.put(routeId, segmentMapResponse.data);
+
+            if (segmentsReceived == activeRoutes.size()) {
+                listProgress.setVisibility(View.INVISIBLE);
+                listView.setAdapter(new RouteAdapter(context, activeRoutes, activeSegments));
+            }
         }
     }
 
@@ -100,7 +137,7 @@ public class RoutesActivity extends AppCompatActivity {
         private final List<AgencyRouteMap.Route> routes;
         private final Context context;
 
-        public RouteAdapter(Context context, List<AgencyRouteMap.Route> routes) {
+        public RouteAdapter(Context context, List<AgencyRouteMap.Route> routes, Map<String, SegmentMap> segments) {
             this.routes = routes;
             this.context = context;
         }
@@ -140,6 +177,9 @@ public class RoutesActivity extends AppCompatActivity {
             routeView.setDesc(currentRoute.stops.size() + " stops");
             TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), ColorGenerator.MATERIAL.getColor(position*10));
             routeView.setIconImageDrawable(icon);
+
+            routeView.setupMap(activeSegments.get(currentRoute.routeId));
+
             return routeView;
         }
 

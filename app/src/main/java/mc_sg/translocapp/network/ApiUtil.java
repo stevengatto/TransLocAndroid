@@ -104,13 +104,13 @@ public class ApiUtil {
                 + region.nearLeft.latitude + "," + region.nearLeft.longitude;
     }
 
-    public static String formatAgencyList(List<Integer> agencyIds) {
+    public static String formatCsv(List<String> agencyIds) {
         if (agencyIds == null) {
             return "";
         }
 
         String formattedList = "";
-        for (Integer id : agencyIds) {
+        for (String id : agencyIds) {
             formattedList += (id + ",");
         }
         // remove last comma

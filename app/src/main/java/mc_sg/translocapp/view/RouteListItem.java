@@ -5,7 +5,6 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -18,15 +17,25 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMapOptions;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
+import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import mc_sg.translocapp.R;
+import mc_sg.translocapp.model.SegmentMap;
 
 public class RouteListItem extends RelativeLayout implements OnMapReadyCallback {
 
     TextView tvTitle, tvDesc;
     ImageView ivIcon;
+
+    SegmentMap segmentMap;
+    GoogleMap map;
 
     public RouteListItem(Context context) {
         this(context, -1);
@@ -59,8 +68,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.item_route_list_map_frame);
 
         FrameLayout frame = new FrameLayout(context);
-        int newId = (seed+1) * 38943;
-        Log.d(null, "***************** NEW ROUTE ITEM HASH: " + newId);
+        int newId = (seed+1) * 38943; // hopefully random hash
         frame.setId(newId);
 
         GoogleMapOptions options = new GoogleMapOptions();
@@ -77,7 +85,42 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        this.map = googleMap;
+        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        if (segmentMap != null) {
+            initMap(segmentMap);
+        }
+
+    }
+
+    public void setupMap(SegmentMap segmentMap) {
+        this.segmentMap = segmentMap;
+        if (map != null) {
+            initMap(segmentMap);
+        }
+    }
+
+    private void initMap(SegmentMap segmentMap) {
+        map.clear();
+
+        if (segmentMap != null) {
+            Set<String> segmentKeys = segmentMap.getSegmentIds();
+            List<LatLng> points;
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            for (String key : segmentKeys) {
+                points = PolyUtil.decode(segmentMap.getPolyline(key));
+                map.addPolyline(new PolylineOptions().addAll(points));
+
+                // determine bounds for map zoom and center
+
+                for (LatLng point : points) {
+                    builder.include(point);
+                }
+            }
+            LatLngBounds bounds = builder.build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 20);
+            map.moveCamera(cameraUpdate);
+        }
     }
 
     public void setTitle(String title) {
