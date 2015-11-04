@@ -2,9 +2,11 @@ package mc_sg.translocapp.view;
 
 import android.app.FragmentManager;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -19,6 +21,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
@@ -33,6 +36,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     TextView tvTitle, tvDesc;
     ImageView ivIcon;
+    Context context;
 
     SegmentMap segmentMap;
     MapFragment mapFrag;
@@ -57,6 +61,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     public RouteListItem(Context context, int seed) {
         super(context);
+        this.context = context;
 
         if (seed == -1) {
             seed = (new Random()).nextInt();
@@ -132,6 +137,9 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
     private void initMap(SegmentMap segmentMap, int polylineColor) {
         map.clear();
 
+        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
+        float polylineWidth = 3 * (metrics.densityDpi / 160f); // 5dp
+
         if (segmentMap != null) {
             Set<String> segmentKeys = segmentMap.getSegmentIds();
             List<LatLng> points;
@@ -140,7 +148,8 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
                 points = PolyUtil.decode(segmentMap.getPolyline(key));
                 map.addPolyline(new PolylineOptions()
                         .addAll(points)
-                        .color(polylineColor));
+                        .color(polylineColor)
+                        .width(polylineWidth));
 
                 // determine bounds for map zoom and center
                 for (LatLng point : points) {

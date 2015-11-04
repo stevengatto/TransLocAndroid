@@ -25,7 +25,7 @@
         android:layout_alignParentBottom="true"
         android:padding="16dp"
         android:background="#C0FFFFFF"
-        android:textColor="#343434"
+        android:textColor="@color/primary_text"
         android:textSize="24sp"
         android:gravity="center"
         android:text="Select your home agency"/>
