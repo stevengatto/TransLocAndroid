@@ -2,6 +2,7 @@ package mc_sg.translocapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -84,7 +85,7 @@ public class RoutesActivity extends AppCompatActivity {
         public void failure(RetrofitError retrofitError) {
             super.failure(retrofitError);
             Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
-            // retry here
+            // TODO: retry routes request here
         }
 
         @Override
@@ -117,7 +118,7 @@ public class RoutesActivity extends AppCompatActivity {
         public void failure(RetrofitError retrofitError) {
             super.failure(retrofitError);
             Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
-            // retry
+            // TODO: retry specific route segment request here with "routeId"
         }
 
         @Override
@@ -175,10 +176,12 @@ public class RoutesActivity extends AppCompatActivity {
                 routeView.setTitle(currentRoute.shortName);
             }
             routeView.setDesc(currentRoute.stops.size() + " stops");
-            TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), ColorGenerator.MATERIAL.getColor(position*10));
+
+            int currentColor = ColorGenerator.MATERIAL.getColor(position*10);
+            TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), currentColor);
             routeView.setIconImageDrawable(icon);
 
-            routeView.setupMap(activeSegments.get(currentRoute.routeId));
+            routeView.setupMap(activeSegments.get(currentRoute.routeId), currentColor);
 
             return routeView;
         }

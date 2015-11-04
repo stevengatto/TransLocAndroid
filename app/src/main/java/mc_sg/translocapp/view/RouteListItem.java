@@ -5,7 +5,7 @@ import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -35,7 +35,9 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
     ImageView ivIcon;
 
     SegmentMap segmentMap;
+    MapFragment mapFrag;
     GoogleMap map;
+    int polylineColor;
 
     public RouteListItem(Context context) {
         this(context, -1);
@@ -60,21 +62,30 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
             seed = (new Random()).nextInt();
         }
 
-        View view = inflate(context, R.layout.item_route_list, this);
+        ViewGroup viewGroup = (ViewGroup) inflate(context, R.layout.item_route_list, this);
+        setDescendantFocusability(FOCUS_BLOCK_DESCENDANTS);
 
-        tvTitle = (TextView) view.findViewById(R.id.item_route_list_title);
-        tvDesc = (TextView) view.findViewById(R.id.item_route_list_desc);
-        ivIcon = (ImageView) view.findViewById(R.id.item_route_list_icon);
-        FrameLayout mapFrame = (FrameLayout) view.findViewById(R.id.item_route_list_map_frame);
+        tvTitle = (TextView) viewGroup.findViewById(R.id.item_route_list_title);
+        tvDesc = (TextView) viewGroup.findViewById(R.id.item_route_list_desc);
+        ivIcon = (ImageView) viewGroup.findViewById(R.id.item_route_list_icon);
+        FrameLayout mapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
 
         FrameLayout frame = new FrameLayout(context);
-        int newId = (seed+1) * 38943; // hopefully random hash
+        int newId = (seed+1) * 38943; // hopefully random hash? ID clash would be bad...
         frame.setId(newId);
 
         GoogleMapOptions options = new GoogleMapOptions();
-        options.liteMode(true); //this makes it possible, otherwise your list view would be really slow
-        MapFragment mapFrag = MapFragment.newInstance(options);
+        options.liteMode(true)
+                .mapToolbarEnabled(false)
+                .ambientEnabled(false)
+                .compassEnabled(false)
+                .rotateGesturesEnabled(false)
+                .scrollGesturesEnabled(false)
+                .zoomControlsEnabled(false)
+                .zoomGesturesEnabled(false)
+                .useViewLifecycleInFragment(true);
 
+        mapFrag = MapFragment.newInstance(options);
         mapFrag.getMapAsync(this);
 
         mapFrame.addView(frame);
@@ -85,22 +96,40 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        // no clicking on the map
+        if (mapFrag.getView() != null) {
+            mapFrag.getView().setClickable(false);
+        }
+
         this.map = googleMap;
+
+        // setup
+        map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        map.getUiSettings().setCompassEnabled(false);
+        map.getUiSettings().setIndoorLevelPickerEnabled(false);
+        map.getUiSettings().setMapToolbarEnabled(false);
+        map.getUiSettings().setMyLocationButtonEnabled(false);
+        map.getUiSettings().setRotateGesturesEnabled(false);
+        map.getUiSettings().setScrollGesturesEnabled(false);
+        map.getUiSettings().setTiltGesturesEnabled(false);
+        map.getUiSettings().setZoomControlsEnabled(false);
+        map.getUiSettings().setZoomGesturesEnabled(false);
+
         map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
         if (segmentMap != null) {
-            initMap(segmentMap);
+            initMap(segmentMap, polylineColor);
         }
-
     }
 
-    public void setupMap(SegmentMap segmentMap) {
+    public void setupMap(SegmentMap segmentMap, int polylineColor) {
         this.segmentMap = segmentMap;
+        this.polylineColor = polylineColor;
         if (map != null) {
-            initMap(segmentMap);
+            initMap(segmentMap, polylineColor);
         }
     }
 
-    private void initMap(SegmentMap segmentMap) {
+    private void initMap(SegmentMap segmentMap, int polylineColor) {
         map.clear();
 
         if (segmentMap != null) {
@@ -109,10 +138,11 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
             for (String key : segmentKeys) {
                 points = PolyUtil.decode(segmentMap.getPolyline(key));
-                map.addPolyline(new PolylineOptions().addAll(points));
+                map.addPolyline(new PolylineOptions()
+                        .addAll(points)
+                        .color(polylineColor));
 
                 // determine bounds for map zoom and center
-
                 for (LatLng point : points) {
                     builder.include(point);
                 }
