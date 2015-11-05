@@ -29,25 +29,6 @@
         android:textSize="24sp"
         android:gravity="center"
         android:text="Select your transit agency"/>
-    
-    <FrameLayout
-        android:id="@+id/map_get_agencies"
-        android:layout_width="42dp"
-        android:layout_height="42dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_margin="8dp"
-        android:background="@drawable/map_style_bg">
-
-        <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
-            android:padding="4dp"
-            android:src="@drawable/refresh_100"/>
-
-    </FrameLayout>
 
     <mc_sg.translocapp.view.ProgressCard
         android:id="@+id/home_agency_progress_card"

@@ -10,6 +10,9 @@ import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -58,6 +61,24 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     private boolean mapInitialized = false;
 
     @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_home_agency, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        if (item.getItemId() ==  R.id.map_get_agencies ) {
+            getAgencies();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_agency);
@@ -95,13 +116,13 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         });
 
         progressCard = (ProgressCard) findViewById(R.id.home_agency_progress_card);
-        findViewById(R.id.map_get_agencies).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getAgencies();
-                progressCard.setVisibility(View.VISIBLE);
-            }
-        });
+//        findViewById(R.id.map_get_agencies).setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                getAgencies();
+//                progressCard.setVisibility(View.VISIBLE);
+//            }
+//        });
     }
 
     @Override
@@ -184,6 +205,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     }
 
     public void getAgencies() {
+        progressCard.setVisibility(View.VISIBLE);
         String geoArea = null;
         if (map != null) {
             geoArea = ApiUtil.getGeoArea(map.getProjection().getVisibleRegion());
