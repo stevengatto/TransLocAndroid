@@ -6,15 +6,20 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.BounceInterpolator;
+import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -32,6 +37,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mc_sg.translocapp.model.Agency;
@@ -40,6 +46,10 @@ import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.MapWrapperLayout;
 import mc_sg.translocapp.view.ProgressCard;
 import retrofit.RetrofitError;
+import tourguide.tourguide.Overlay;
+import tourguide.tourguide.Pointer;
+import tourguide.tourguide.ToolTip;
+import tourguide.tourguide.TourGuide;
 
 public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -47,6 +57,8 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     public static final String KEY_PREFS_AGENCY_ID = "key_home_agency_id"; // key for id in sharedprefs
 
     private Activity context;
+    private TourGuide tourGuideHandler;
+    private View refresh;
     private GoogleApiClient mGoogleApiClient;
     private GoogleMap map;
     private MapWrapperLayout mapWrapper;
@@ -60,31 +72,33 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     private Integer mapBottomPadding = null;
     private boolean mapInitialized = false;
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_home_agency, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        if (item.getItemId() ==  R.id.map_get_agencies ) {
-            getAgencies();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.menu_home_agency, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle item selection
+//        if (item.getItemId() ==  R.id.map_get_agencies ) {
+//            getAgencies();
+//            return true;
+//        } else {
+//            return super.onOptionsItemSelected(item);
+//        }
+//    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_agency);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Agencies");
         setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null) {
+            getSupportActionBar().setTitle("Agencies");
+        }
 
         context = this;
         buildGoogleApiClient();
@@ -116,13 +130,17 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         });
 
         progressCard = (ProgressCard) findViewById(R.id.home_agency_progress_card);
-//        findViewById(R.id.map_get_agencies).setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                getAgencies();
-//                progressCard.setVisibility(View.VISIBLE);
-//            }
-//        });
+        refresh = findViewById(R.id.home_toolbar_refresh);
+
+        refresh.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getAgencies();
+                tourGuideHandler.cleanUp();
+            }
+        });
+
+        initTour();
     }
 
     @Override
@@ -137,6 +155,32 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+    }
+
+    private void initTour() {
+        Animation animation = new TranslateAnimation(0f, 0f, 200f, 0f);
+        animation.setDuration(1000);
+        animation.setFillAfter(true);
+        animation.setInterpolator(new BounceInterpolator());
+
+        ToolTip toolTip = new ToolTip()
+                .setTitle("Welcome!")
+                .setDescription("Click the globe to find nearby transit agencies")
+                .setTextColor(Color.parseColor("#bdc3c7"))
+                .setBackgroundColor(Color.parseColor("#e74c3c"))
+                .setShadow(true)
+                .setGravity(Gravity.BOTTOM | Gravity.LEFT)
+                .setEnterAnimation(animation);
+
+        Overlay overlay = new Overlay()
+                .disableClick(true)
+                .setStyle(Overlay.Style.Circle);
+
+        tourGuideHandler = TourGuide.init(this).with(TourGuide.Technique.Click)
+                .setPointer(new Pointer())
+                .setToolTip(toolTip)
+                .setOverlay(overlay)
+                .playOn(refresh);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -200,7 +244,6 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
             mapInitialized = true;
-            getAgencies();
         }
     }
 
