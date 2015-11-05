@@ -30,7 +30,9 @@
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
 
-        <activity android:name=".HomeAgencyActivity"
+        <activity
+            android:name=".HomeAgencyActivity"
+            android:label="@string/title_activity_home_agency"
             android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 

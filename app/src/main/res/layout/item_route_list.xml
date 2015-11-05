@@ -20,7 +20,19 @@
             android:layout_marginStart="8dp"
             android:layout_marginLeft="8dp"
             android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp" />
+            android:layout_marginRight="8dp"
+            android:background="#ececec">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:textColor="@color/primary_text"
+                android:textSize="22sp"
+                android:text="Map is not available\nfor this route."/>
+
+        </FrameLayout>
 
         <ImageView
             android:id="@+id/item_route_list_icon"

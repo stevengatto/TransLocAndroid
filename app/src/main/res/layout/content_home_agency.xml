@@ -24,11 +24,11 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:padding="16dp"
-        android:background="#C0FFFFFF"
+        android:background="#D0FFFFFF"
         android:textColor="@color/primary_text"
         android:textSize="24sp"
         android:gravity="center"
-        android:text="Select your home agency"/>
+        android:text="Select your transit agency"/>
     
     <FrameLayout
         android:id="@+id/map_get_agencies"
@@ -48,6 +48,14 @@
             android:src="@drawable/refresh_100"/>
 
     </FrameLayout>
+
+    <mc_sg.translocapp.view.ProgressCard
+        android:id="@+id/home_agency_progress_card"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"
+        app:text="Finding nearby agencies..."/>
 
 </RelativeLayout>
 

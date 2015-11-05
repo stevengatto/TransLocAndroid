@@ -135,6 +135,10 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
     }
 
     private void initMap(SegmentMap segmentMap, int polylineColor) {
+        if (mapFrag.getView() != null && mapFrag.getView().getVisibility() == INVISIBLE) {
+            mapFrag.getView().setVisibility(VISIBLE);
+        }
+
         map.clear();
 
         DisplayMetrics metrics = context.getResources().getDisplayMetrics();
@@ -144,6 +148,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
             Set<String> segmentKeys = segmentMap.getSegmentIds();
             List<LatLng> points;
             LatLngBounds.Builder builder = new LatLngBounds.Builder();
+            boolean pointIncluded = false;
             for (String key : segmentKeys) {
                 points = PolyUtil.decode(segmentMap.getPolyline(key));
                 map.addPolyline(new PolylineOptions()
@@ -153,12 +158,18 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
                 // determine bounds for map zoom and center
                 for (LatLng point : points) {
+                    pointIncluded = true; // flag so that the Builder doesn't crash when empty
                     builder.include(point);
                 }
             }
-            LatLngBounds bounds = builder.build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 20);
-            map.moveCamera(cameraUpdate);
+
+            if (pointIncluded) {
+                LatLngBounds bounds = builder.build();
+                CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 20);
+                map.moveCamera(cameraUpdate);
+            } else  if (mapFrag.getView() != null) {
+                mapFrag.getView().setVisibility(INVISIBLE);
+            }
         }
     }
 

@@ -24,6 +24,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,6 +35,8 @@ import mc_sg.translocapp.model.Agency;
 import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.MapWrapperLayout;
+import mc_sg.translocapp.view.ProgressCard;
+import retrofit.RetrofitError;
 
 public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -47,6 +50,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     private ViewGroup infoWindow;
     private TextView infoTitle;
     private Button infoButton;
+    private ProgressCard progressCard;
     private MapWrapperLayout.OnInfoWindowElemTouchListener infoWindowListener;
     private Location lastLocation;
     private List<Agency> agencyList;
@@ -90,10 +94,12 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
             }
         });
 
+        progressCard = (ProgressCard) findViewById(R.id.home_agency_progress_card);
         findViewById(R.id.map_get_agencies).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getAgencies();
+                progressCard.setVisibility(View.VISIBLE);
             }
         });
     }
@@ -125,9 +131,20 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+
+        // map configuration
         map.setMyLocationEnabled(true);
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        UiSettings uiSettings = map.getUiSettings();
+        uiSettings.setMyLocationButtonEnabled(true);
+        uiSettings.setZoomControlsEnabled(false);
+        uiSettings.setTiltGesturesEnabled(false);
+        uiSettings.setRotateGesturesEnabled(false);
+        uiSettings.setCompassEnabled(false);
+        uiSettings.setIndoorLevelPickerEnabled(false);
+        uiSettings.setMapToolbarEnabled(false);
 
+        // pad map "Google" icon above bottom view
         if (mapBottomPadding != null) {
             map.setPadding(0, 0, 0, mapBottomPadding);
         }
@@ -160,7 +177,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         lastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (lastLocation != null && map != null && !mapInitialized) {
             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 13));
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 11));
             mapInitialized = true;
             getAgencies();
         }
@@ -261,7 +278,14 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
         }
 
         @Override
+        public void failure(RetrofitError retrofitError) {
+            super.failure(retrofitError);
+            progressCard.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         public void success(Response<List<Agency>> listResponse, retrofit.client.Response response) {
+            progressCard.setVisibility(View.INVISIBLE);
             if (map != null) {
                 map.clear();
                 agencyList = listResponse.data;
