@@ -18,9 +18,11 @@ import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.Response;
@@ -65,6 +67,8 @@ public class RoutesActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.routes_listview);
         listView.setOnItemClickListener(new OnRouteClick());
         listProgress = findViewById(R.id.routes_list_progress_card);
+
+
     }
 
     private class OnRouteClick implements AdapterView.OnItemClickListener {
@@ -165,10 +169,46 @@ public class RoutesActivity extends AppCompatActivity {
             return position;
         }
 
+
+        private class FavoriteBtnListener implements View.OnClickListener {
+
+            private static final String FAVORITES = "routes_favorites";
+            private static final String ROUTES = "routes";
+
+            @Override
+            public void onClick(View view) {
+                String routeId = (String) view.getTag();
+                SharedPreferences prefs = context.getSharedPreferences(FAVORITES, Context.MODE_PRIVATE);
+                Set<String> routes = prefs.getStringSet(ROUTES, new HashSet<String>());
+
+                if (!routes.isEmpty() && routes.contains(routeId)) {
+                    routes.remove(routeId);
+                    notify("Route has been removed!").show();
+                    // TODO: update image of the favorite icon
+
+                } else {
+                    routes.add(routeId);
+                    notify("Route has been added!").show();
+                    // TODO: update image of the favorite icon
+                }
+
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putStringSet(ROUTES, routes);
+                editor.apply();
+            }
+
+            public Toast notify(String text) {
+                return Toast.makeText(context, text, Toast.LENGTH_LONG);
+            }
+
+        }
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new RouteListItem(context, position);
+                convertView = new RouteListItem(context, position, activeRoutes.get(position).routeId);
+                convertView
+                        .findViewById(R.id.item_route_list_favorite)
+                        .setOnClickListener(new FavoriteBtnListener());
             }
             RouteListItem routeView = (RouteListItem) convertView;
             AgencyRouteMap.Route currentRoute = routes.get(position);

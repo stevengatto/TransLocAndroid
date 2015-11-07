@@ -1,36 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_margin="8dp">
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    card_view:cardCornerRadius="4dp"
+    android:layout_margin="8dp"
+    card_view:cardPreventCornerOverlap="false">
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:color/transparent">
+        android:layout_height="wrap_content">
 
         <FrameLayout
             android:id="@+id/item_route_list_map_frame"
             android:layout_width="match_parent"
             android:layout_height="200dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignParentTop="true"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginLeft="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginRight="8dp"
-            android:background="#ececec">
+            android:clickable="true">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:textColor="@color/primary_text"
-                android:textSize="22sp"
-                android:text="Map is not available\nfor this route."/>
+            
+
+            <ImageView
+                android:id="@+id/no_image"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:scaleType="centerCrop"
+                android:layout_gravity="bottom"
+                android:src="@drawable/android_bus_image_small" />
+
+
 
         </FrameLayout>
 
@@ -84,7 +87,29 @@
                 android:textSize="16sp" />
 
         </RelativeLayout>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/item_route_list_icon"
+            >
 
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.2dp"
+                android:background="#EEEEEE"/>
+
+            <ImageView
+                android:id="@+id/item_route_list_favorite"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_favorite_black_24dp"
+                android:background="@android:color/transparent"
+                />
+        </RelativeLayout>
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>

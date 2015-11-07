@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 
 repositories {
     mavenCentral()
+    jcenter()
     maven(){
         url "https://oss.sonatype.org/content/repositories/snapshots"
     }
@@ -46,7 +47,7 @@ dependencies {
     compile 'com.squareup.okio:okio:1.6.0'
     compile 'com.squareup.okhttp:okhttp:2.5.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
-
+    compile 'com.nvanbenschoten.motion:library:1.1.2'
     compile 'com.google.android.gms:play-services:8.1.0'
     compile 'com.google.maps.android:android-maps-utils:0.4'
 

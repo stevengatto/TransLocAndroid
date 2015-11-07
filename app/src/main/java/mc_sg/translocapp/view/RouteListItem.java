@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.ViewGroup;
@@ -24,6 +25,7 @@ import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
+import com.nvanbenschoten.motion.ParallaxImageView;
 
 import java.util.List;
 import java.util.Random;
@@ -35,7 +37,9 @@ import mc_sg.translocapp.model.SegmentMap;
 public class RouteListItem extends RelativeLayout implements OnMapReadyCallback {
 
     TextView tvTitle, tvDesc;
-    ImageView ivIcon;
+    ImageView ivIcon, ivFavorite;
+    ParallaxImageView x;
+    CardView card;
     Context context;
 
     SegmentMap segmentMap;
@@ -44,22 +48,22 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
     int polylineColor;
 
     public RouteListItem(Context context) {
-        this(context, -1);
+        this(context, -1, null);
     }
 
     public RouteListItem(Context context, AttributeSet attrs) {
-        this(context, -1);
+        this(context, -1, null);
     }
 
     public RouteListItem(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, -1);
+        this(context, -1, null);
     }
 
     public RouteListItem(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        this(context, -1);
+        this(context, -1, null);
     }
 
-    public RouteListItem(Context context, int seed) {
+    public RouteListItem(Context context, int seed, String routeId) {
         super(context);
         this.context = context;
 
@@ -73,6 +77,15 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         tvTitle = (TextView) viewGroup.findViewById(R.id.item_route_list_title);
         tvDesc = (TextView) viewGroup.findViewById(R.id.item_route_list_desc);
         ivIcon = (ImageView) viewGroup.findViewById(R.id.item_route_list_icon);
+        ivFavorite = (ImageView) viewGroup.findViewById(R.id.item_route_list_favorite);
+//        x = (ParallaxImageView) viewGroup.findViewById(R.id.no_image);
+//        x.registerSensorManager();
+
+//        card = (CardView) viewGroup.findViewById(R.id.)
+        ivFavorite.setTag(routeId); // tag the favorite button with the route id string
+
+
+
         FrameLayout mapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
 
         FrameLayout frame = new FrameLayout(context);
@@ -89,13 +102,12 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
                 .zoomControlsEnabled(false)
                 .zoomGesturesEnabled(false)
                 .useViewLifecycleInFragment(true);
-
         mapFrag = MapFragment.newInstance(options);
         mapFrag.getMapAsync(this);
 
-        mapFrame.addView(frame);
-        FragmentManager fm = ((AppCompatActivity) context).getFragmentManager();
-        fm.beginTransaction().add(newId, mapFrag).commit();
+//        mapFrame.addView(frame);
+//        FragmentManager fm = ((AppCompatActivity) context).getFragmentManager();
+//        fm.beginTransaction().add(newId, mapFrag).commit();
     }
 
 
