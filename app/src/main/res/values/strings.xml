@@ -4,4 +4,7 @@
     <string name="title_activity_main2">Main2Activity</string>
     <string name="title_activity_routes">RoutesActivity</string>
     <string name="title_activity_home_agency">HomeAgencyActivity</string>
+    <string name="title_activity_route">RouteActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
