@@ -27,5 +27,6 @@ public class LauncherActivity extends Activity {
             Intent mapIntent = new Intent(this, HomeAgencyActivity.class);
             startActivity(mapIntent);
         }
+        finish();
     }
 }

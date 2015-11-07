@@ -12,9 +12,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -37,7 +34,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import mc_sg.translocapp.model.Agency;
@@ -316,6 +312,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                                     editor.putString(KEY_PREFS_AGENCY_ID, homeAgency.agencyId);
                                     editor.apply();
                                     startActivity(new Intent(context, RoutesActivity.class));
+                                    finish();
                                     break;
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     // Do nothing
