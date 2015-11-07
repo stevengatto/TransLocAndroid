@@ -44,7 +44,7 @@ public class AgencyVehicleMap extends HashMap<String, List<AgencyVehicleMap.Vehi
      *      "vehicle_id": "4002320",
      *      "segment_id": "4043935",
      *      "route_id": "4000098",
-     *      "arrival_estimates": [],
+     *      "view_arrival_estimates": [],
      *      "tracking_status": "up",
      *      "location": {
      *          "lat": 35.78867,

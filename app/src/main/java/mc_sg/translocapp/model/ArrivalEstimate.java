@@ -36,7 +36,7 @@ public class ArrivalEstimate {
         public String vehicleId;
 
         @SerializedName("arrival_at")
-        public Date arrivalAt;
+        public String arrivalAt;
 
         public String type;
     }

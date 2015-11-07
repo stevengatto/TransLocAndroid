@@ -23,71 +23,64 @@
 
         </android.support.design.widget.AppBarLayout>
 
-        <fragment
-            android:id="@+id/single_route_map_fragment"
-            class="com.google.android.gms.maps.SupportMapFragment"
-            android:layout_width="match_parent"
-            android:layout_height="350dp"
-            android:layout_below="@id/single_route_toolbar" />
-
-        <View
-            android:id="@+id/single_route_card_shadow"
-            android:layout_width="match_parent"
-            android:layout_height="5dp"
-            android:background="@drawable/top_shadow"
-            android:layout_alignBottom="@id/single_route_map_fragment"/>
-
-        <android.support.v7.widget.CardView
-            android:id="@+id/single_route_card"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentBottom="true"
-            android:layout_below="@id/single_route_map_fragment">
+            android:layout_below="@id/single_route_toolbar"
+            android:orientation="vertical">
+
+            <fragment
+                android:id="@+id/single_route_map_fragment"
+                class="com.google.android.gms.maps.SupportMapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:layout_marginBottom="-5dp"
+                android:clipChildren="false"
+                android:clipToPadding="false"/>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="16dp">
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:clipChildren="false"
+                android:clipToPadding="false">
 
-                <TextView
-                    android:id="@+id/single_route_info_1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:ellipsize="marquee"
-                    android:textColor="@color/primary_text"/>
+                <View
+                    android:id="@+id/single_route_card_shadow"
+                    android:layout_width="match_parent"
+                    android:layout_height="5dp"
+                    android:background="@drawable/top_shadow"
+                    android:layout_alignParentTop="true"/>
 
-                <TextView
-                    android:id="@+id/single_route_info_2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/single_route_info_1"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentStart="true"
-                    android:layout_marginTop="8dp"
-                    android:textSize="18sp"
-                    android:maxLines="1"
-                    android:ellipsize="marquee"
-                    android:textColor="@color/secondary_text"/>
+                <android.support.v7.widget.CardView
+                    android:id="@+id/single_route_card"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/single_route_card_shadow">
+
+                    <ListView
+                        android:id="@+id/single_route_info_list"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+
+                </android.support.v7.widget.CardView>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/fab"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignTop="@id/single_route_card"
+                    android:layout_marginTop="-28dp"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginRight="24dp"
+                    android:layout_marginEnd="24dp"/>
 
             </RelativeLayout>
 
-        </android.support.v7.widget.CardView>
-
-        <android.support.design.widget.FloatingActionButton
-            android:id="@+id/fab"
-            android:layout_width="56dp"
-            android:layout_height="56dp"
-            android:layout_alignTop="@id/single_route_card"
-            android:layout_marginTop="-28dp"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginRight="24dp"
-            android:layout_marginEnd="24dp"/>
+        </LinearLayout>
 
     </RelativeLayout>
 

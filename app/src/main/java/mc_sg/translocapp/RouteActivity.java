@@ -1,26 +1,23 @@
 package mc_sg.translocapp;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -29,18 +26,17 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.AgencyVehicleMap;
+import mc_sg.translocapp.model.ArrivalEstimate;
 import mc_sg.translocapp.model.Response;
-import mc_sg.translocapp.model.SegmentMap;
 import mc_sg.translocapp.network.ApiUtil;
+import mc_sg.translocapp.view.ArrivalEstimateView;
 
 public class RouteActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -56,6 +52,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
     private GoogleMap map;
     private FloatingActionButton favorite;
     private CardView cardView;
+    private ListView stopList;
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private List<LatLng> polyPoints = new ArrayList<>();
@@ -76,8 +73,6 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 || route.shortName.isEmpty() ? route.longName : route.shortName));
         setSupportActionBar(toolbar);
 
-        ((TextView) findViewById(R.id.single_route_info_1)).setText(route.routeId);
-
         ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.single_route_map_fragment)).getMapAsync(this);
 
@@ -91,8 +86,16 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 ApiUtil.getTransLocApi().getVehicles(agencyId, null, route.routeId, new VehiclesCallback(context));
             }
         });
+
+        stopList = (ListView) findViewById(R.id.single_route_info_list);
+
     }
 
+//    public static String getTime(String ISOString, Context context) {
+//        Date now = new Date();
+//        Date date = new DateTime(ISOString).toDate();
+//        DateUtils.formatDateRange(context, date.getTime(), now.getTime(), 1);
+//    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -142,8 +145,14 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                         map.moveCamera(cameraUpdate);
                         // Remove listener to prevent position reset on camera move.
                         map.setOnCameraChangeListener(null);
+
+                        // Get Vehicle locations
                         ApiUtil.getTransLocApi().getVehicles(agencyId, null, route.routeId,
                                 new VehiclesCallback(context));
+
+                        // Get arrival estimates
+                        ApiUtil.getTransLocApi().getArrivalEstimates(agencyId, route.routeId,
+                                ApiUtil.formatCsv(route.stops), new ArrivalCallback(context));
                     }
                 });
             }
@@ -166,15 +175,17 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
             ArrayList<LatLng> vehiclePoints = new ArrayList<>(); // needed for bounds
             List<AgencyVehicleMap.Vehicle> vehicles = vehicleResponse.data.getVehicles(agencyId);
-            for (AgencyVehicleMap.Vehicle vehicle : vehicles) {
-                if (vehicle.routeId.equals(route.routeId)) { // always should but the API has surprised me before
-                    BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.bus_marker);
-                    LatLng latLng = new LatLng(Double.parseDouble(vehicle.location.lat),
-                            Double.parseDouble(vehicle.location.lng));
-                    vehiclePoints.add(latLng);
+            if (vehicles != null) {
+                for (AgencyVehicleMap.Vehicle vehicle : vehicles) {
+                    if (vehicle.routeId.equals(route.routeId)) { // always should but the API has surprised me before
+//                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.bus_marker);
+                        LatLng latLng = new LatLng(Double.parseDouble(vehicle.location.lat),
+                                Double.parseDouble(vehicle.location.lng));
+                        vehiclePoints.add(latLng);
 
-                    Marker marker = map.addMarker(new MarkerOptions().position(latLng));
-                    markers.add(marker);
+                        Marker marker = map.addMarker(new MarkerOptions().position(latLng));
+                        markers.add(marker);
+                    }
                 }
             }
 
@@ -188,12 +199,81 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                     allOffScreen = false;
                 }
             }
+
             if (allOffScreen) {
                 Toast.makeText(context, "All buses are located off-screen", Toast.LENGTH_SHORT).show();
             } else if (someOffScreen) {
                 Toast.makeText(context, "Some buses are located off-screen", Toast.LENGTH_SHORT).show();
             }
 
+        }
+    }
+
+    private class ArrivalCallback extends ApiUtil.RetroCallback<Response<List<ArrivalEstimate>>> {
+
+        public ArrivalCallback(Context context) {
+            super(context);
+        }
+
+        @Override
+        public void success(Response<List<ArrivalEstimate>> listResponse, retrofit.client.Response response) {
+            stopList.setAdapter(new ArrivalAdapter(context, listResponse.data));
+        }
+    }
+
+    private class ArrivalAdapter extends BaseAdapter {
+
+        private final List<ArrivalEstimate> arrivals;
+        private final Context context;
+
+        public ArrivalAdapter(Context context, List<ArrivalEstimate> arrivals) {
+            this.arrivals = arrivals;
+            this.context = context;
+        }
+
+        protected List<ArrivalEstimate> getArrivals() {
+            return arrivals;
+        }
+
+        @Override
+        public int getCount() {
+            return getArrivals().size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return getArrivals().get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            if (convertView == null) {
+                convertView =  new ArrivalEstimateView(context);
+            }
+
+            ArrivalEstimate estimate = arrivals.get(position);
+            ArrivalEstimateView arrival = (ArrivalEstimateView) convertView;
+
+            arrival.setName("Stop name");
+            arrival.setRealTime(estimate.arrivals.get(0).toString()); // possible NPE
+            arrival.setRealTime(estimate.arrivals.get(0).toString()); // possible NPE
+
+            return arrival;
+        }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            return true;
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return getArrivals().isEmpty();
         }
     }
 
