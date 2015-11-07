@@ -74,9 +74,8 @@ public class RoutesActivity extends AppCompatActivity {
             AgencyRouteMap.Route route = activeRoutes.get(position);
             Intent intent = new Intent(context, RouteActivity.class);
             Bundle data = new Bundle();
-            data.putString(RouteActivity.KEY_ROUTE_ID, route.routeId);
-            data.putString(RouteActivity.KEY_ROUTE_NAME, (route.shortName == null
-                    || route.shortName.isEmpty() ? route.longName : route.shortName));
+            data.putSerializable(RouteActivity.KEY_ROUTE, route);
+            data.putSerializable(RouteActivity.KEY_ROUTE_SEGMENTS, activeSegments.get(route.routeId));
             intent.putExtras(data);
             startActivity(intent);
         }
