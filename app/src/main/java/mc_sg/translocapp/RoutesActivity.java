@@ -1,6 +1,7 @@
 package mc_sg.translocapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -74,7 +75,13 @@ public class RoutesActivity extends AppCompatActivity {
     private class OnRouteClick implements AdapterView.OnItemClickListener {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            Toast.makeText(context, "Route " + activeRoutes.get(position).routeId + " clicked", Toast.LENGTH_LONG).show();
+            AgencyRouteMap.Route route = activeRoutes.get(position);
+            Intent intent = new Intent(context, RouteActivity.class);
+            Bundle data = new Bundle();
+            data.putSerializable(RouteActivity.KEY_ROUTE, route);
+            data.putSerializable(RouteActivity.KEY_ROUTE_SEGMENTS, activeSegments.get(route.routeId));
+            intent.putExtras(data);
+            startActivity(intent);
         }
     }
 

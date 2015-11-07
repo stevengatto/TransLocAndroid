@@ -10,7 +10,7 @@ import java.util.Set;
 /**
  * Created by steven on 10/23/15.
  */
-public class AgencyVehicleMap extends HashMap<String, ArrayList<AgencyVehicleMap.Vehicle>> {
+public class AgencyVehicleMap extends HashMap<String, List<AgencyVehicleMap.Vehicle>> {
 
     public Set<String> getAgencyIds() {
         return this.keySet();
@@ -21,7 +21,7 @@ public class AgencyVehicleMap extends HashMap<String, ArrayList<AgencyVehicleMap
     }
 
     public AgencyVehicleMap.Vehicle getVehicle(String agencyId, String routeId) {
-        ArrayList<AgencyVehicleMap.Vehicle> vehicles = this.get(agencyId);
+        List<AgencyVehicleMap.Vehicle> vehicles = this.get(agencyId);
         if (vehicles != null) {
             for (AgencyVehicleMap.Vehicle vehicle : vehicles) {
                 if (vehicle.routeId.equals(routeId)) {
@@ -84,7 +84,7 @@ public class AgencyVehicleMap extends HashMap<String, ArrayList<AgencyVehicleMap
         public String routeId;
 
         @SerializedName("arrival_estimates")
-        public List<String> arrivalEstimates;
+        public List<Estimate> arrivalEstimates;
 
         @SerializedName("tracking_status")
         public String trackingStatus;
@@ -92,7 +92,19 @@ public class AgencyVehicleMap extends HashMap<String, ArrayList<AgencyVehicleMap
         public Location location;
 
         public class Location {
-            String lat, lng;
+            public String lat, lng;
+        }
+
+        public class Estimate {
+            @SerializedName("route_id")
+            public String routeId;
+
+            @SerializedName("arrival_at")
+            public String arrivalAt;
+
+            @SerializedName("stop_id")
+            public String stopId;
+
         }
 
     }

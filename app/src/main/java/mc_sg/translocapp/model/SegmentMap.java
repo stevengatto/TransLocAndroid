@@ -1,5 +1,6 @@
 package mc_sg.translocapp.model;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -33,7 +34,7 @@ import java.util.Set;
  *      "segment_id" : "google polyline"
  *  }
  */
-public class SegmentMap extends HashMap<String, String> {
+public class SegmentMap extends HashMap<String, String> implements Serializable {
 
     public String getPolyline(String key) {
         return this.get(key);
