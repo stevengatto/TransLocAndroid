@@ -43,6 +43,7 @@ public class RoutesActivity extends AppCompatActivity {
     private Context context;
 
     private List<AgencyRouteMap.Route> activeRoutes;
+    Map<Integer, Integer> colorMap = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +81,7 @@ public class RoutesActivity extends AppCompatActivity {
             Bundle data = new Bundle();
             data.putSerializable(RouteActivity.KEY_ROUTE, route);
             data.putSerializable(RouteActivity.KEY_ROUTE_SEGMENTS, activeSegments.get(route.routeId));
+            data.putInt(RouteActivity.KEY_COLOR, colorMap.get(position));
             intent.putExtras(data);
             startActivity(intent);
         }
@@ -149,8 +151,6 @@ public class RoutesActivity extends AppCompatActivity {
 
         private final List<AgencyRouteMap.Route> routes;
         private final Context context;
-
-        Map<Integer, Integer> colorMap = new HashMap<>();
 
         public RouteAdapter(Context context, List<AgencyRouteMap.Route> routes, Map<String, SegmentMap> segments) {
             this.routes = routes;
@@ -240,7 +240,7 @@ public class RoutesActivity extends AppCompatActivity {
                 currentColor = colorMap.get(position);
             }
 
-            routeView.setBackgroundColor(currentColor);
+            routeView.setBackgroundColor(currentColor); // remove alpha
             routeView.setupMap(activeSegments.get(currentRoute.routeId), currentColor);
             return routeView;
         }

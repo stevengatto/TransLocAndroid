@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.view.Menu;
@@ -45,13 +46,17 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
     public static final String KEY_ROUTE = "KEY_ROUTE";
     public static final String KEY_ROUTE_SEGMENTS = "KEY_ROUTE_SEGMENTS";
+    public static final String KEY_COLOR = "key_color";
 
     private Context context;
     private AgencyRouteMap.Route route;
+    private int color;
     private String agencyId;
     private HashMap<String,String> segments;
     private GoogleMap map;
     private FloatingActionButton favorite;
+    private CardView cardView;
+
     private ArrayList<Marker> markers = new ArrayList<>();
     private List<LatLng> polyPoints = new ArrayList<>();
 
@@ -63,6 +68,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
         route = (AgencyRouteMap.Route) getIntent().getExtras().getSerializable(KEY_ROUTE);
         segments = (HashMap<String,String>) getIntent().getExtras().getSerializable(KEY_ROUTE_SEGMENTS);
+        color = getIntent().getExtras().getInt(KEY_COLOR);
         agencyId = Integer.valueOf(route.agencyId).toString();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -74,6 +80,9 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
         ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.single_route_map_fragment)).getMapAsync(this);
+
+        cardView = (CardView) findViewById(R.id.single_route_card);
+        cardView.setCardBackgroundColor(color);
 
         favorite = (FloatingActionButton) findViewById(R.id.fab);
         favorite.setOnClickListener(new View.OnClickListener() {
@@ -113,7 +122,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 points = PolyUtil.decode(segments.get(key));
                 map.addPolyline(new PolylineOptions()
                         .addAll(points)
-                        .color(R.color.colorPrimary)
+                        .color(color)
                         .width(polylineWidth));
 
                 // determine bounds for map zoom and center
