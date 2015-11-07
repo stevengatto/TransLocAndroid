@@ -191,12 +191,12 @@ public class RoutesActivity extends AppCompatActivity {
                 if (!routes.isEmpty() && routes.contains(routeId)) {
                     routes.remove(routeId);
                     notify("Route has been removed!").show();
-                    // TODO: update image of the favorite icon
+                    view.setSelected(false);
 
                 } else {
                     routes.add(routeId);
                     notify("Route has been added!").show();
-                    // TODO: update image of the favorite icon
+                    view.setSelected(true);
                 }
 
                 SharedPreferences.Editor editor = prefs.edit();
@@ -233,19 +233,15 @@ public class RoutesActivity extends AppCompatActivity {
             // make sure we get a dark color for the polyline
             if (colorMap.get(position) == null) {
                 while (!isColorDark(currentColor)) {
-                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
+                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt()*10);
                 }
                 colorMap.put(position, currentColor);
             } else {
                 currentColor = colorMap.get(position);
             }
 
-
-            TextDrawable icon = TextDrawable.builder().buildRound((""+(position+1)), currentColor);
-            routeView.setIconImageDrawable(icon);
-
+            routeView.setBackgroundColor(currentColor);
             routeView.setupMap(activeSegments.get(currentRoute.routeId), currentColor);
-
             return routeView;
         }
 

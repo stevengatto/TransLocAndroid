@@ -2,7 +2,6 @@ package mc_sg.translocapp.view;
 
 import android.app.FragmentManager;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
@@ -22,10 +21,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
-import com.nvanbenschoten.motion.ParallaxImageView;
 
 import java.util.List;
 import java.util.Random;
@@ -37,8 +34,7 @@ import mc_sg.translocapp.model.SegmentMap;
 public class RouteListItem extends RelativeLayout implements OnMapReadyCallback {
 
     TextView tvTitle, tvDesc;
-    ImageView ivIcon, ivFavorite;
-    ParallaxImageView x;
+    ImageView ivFavorite;
     CardView card;
     Context context;
 
@@ -76,20 +72,15 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
         tvTitle = (TextView) viewGroup.findViewById(R.id.item_route_list_title);
         tvDesc = (TextView) viewGroup.findViewById(R.id.item_route_list_desc);
-        ivIcon = (ImageView) viewGroup.findViewById(R.id.item_route_list_icon);
+        card = (CardView) viewGroup.findViewById(R.id.item_route_list_cardview);
         ivFavorite = (ImageView) viewGroup.findViewById(R.id.item_route_list_favorite);
-//        x = (ParallaxImageView) viewGroup.findViewById(R.id.no_image);
-//        x.registerSensorManager();
-
-//        card = (CardView) viewGroup.findViewById(R.id.)
         ivFavorite.setTag(routeId); // tag the favorite button with the route id string
-
 
 
         FrameLayout mapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
 
         FrameLayout frame = new FrameLayout(context);
-        int newId = (seed+1) * 38943; // hopefully random hash? ID clash would be bad...
+        int newId = (seed + 1) * 38943; // hopefully random hash? ID clash would be bad...
         frame.setId(newId);
 
         GoogleMapOptions options = new GoogleMapOptions();
@@ -105,9 +96,9 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         mapFrag = MapFragment.newInstance(options);
         mapFrag.getMapAsync(this);
 
-//        mapFrame.addView(frame);
-//        FragmentManager fm = ((AppCompatActivity) context).getFragmentManager();
-//        fm.beginTransaction().add(newId, mapFrag).commit();
+        mapFrame.addView(frame);
+        FragmentManager fm = ((AppCompatActivity) context).getFragmentManager();
+        fm.beginTransaction().add(newId, mapFrag).commit();
     }
 
 
@@ -179,7 +170,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
                 LatLngBounds bounds = builder.build();
                 CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 20);
                 map.moveCamera(cameraUpdate);
-            } else  if (mapFrag.getView() != null) {
+            } else if (mapFrag.getView() != null) {
                 mapFrag.getView().setVisibility(INVISIBLE);
             }
         }
@@ -193,7 +184,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         tvDesc.setText(desc);
     }
 
-    public void setIconImageDrawable(Drawable image) {
-        ivIcon.setImageDrawable(image);
+    public void setBackgroundColor(int color) {
+        card.setCardBackgroundColor(color);
     }
 }
