@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -33,6 +35,9 @@ import mc_sg.translocapp.view.RouteListItem;
 import retrofit.RetrofitError;
 
 public class RoutesActivity extends AppCompatActivity {
+
+    public static final String PREFS_FAVORITES = "favorites_prefs";
+    public static final String KEY_PREFS_FAV_ROUTES = "key_favorite_routes";
 
     private int segmentsReceived = 0;
     private Map<String, SegmentMap> activeSegments = new HashMap<>();
@@ -108,11 +113,15 @@ public class RoutesActivity extends AppCompatActivity {
             List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
             activeRoutes = new ArrayList<>();
 
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
+            Set<String> routeIds = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+
             for (AgencyRouteMap.Route route : routes) {
                 if (route.isActive) {
                     activeRoutes.add(route);
                     ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
                             new SegmentsCallback(context, route.routeId));
+                    route.following = routeIds.contains(route.routeId);
                 }
             }
         }
@@ -179,14 +188,11 @@ public class RoutesActivity extends AppCompatActivity {
 
         private class FavoriteBtnListener implements View.OnClickListener {
 
-            private static final String FAVORITES = "routes_favorites";
-            private static final String ROUTES = "routes";
-
             @Override
             public void onClick(View view) {
                 String routeId = (String) view.getTag();
-                SharedPreferences prefs = context.getSharedPreferences(FAVORITES, Context.MODE_PRIVATE);
-                Set<String> routes = prefs.getStringSet(ROUTES, new HashSet<String>());
+                SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
+                Set<String> routes = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
                 if (!routes.isEmpty() && routes.contains(routeId)) {
                     routes.remove(routeId);
@@ -200,8 +206,14 @@ public class RoutesActivity extends AppCompatActivity {
                 }
 
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putStringSet(ROUTES, routes);
+                editor.putStringSet(KEY_PREFS_FAV_ROUTES, routes);
                 editor.apply();
+
+                for (AgencyRouteMap.Route route : activeRoutes) {
+                    if (route.routeId.equals(routeId)) {
+                        route.following = !route.following;
+                    }
+                }
             }
 
             public Toast notify(String text) {
@@ -226,6 +238,7 @@ public class RoutesActivity extends AppCompatActivity {
                 routeView.setTitle(currentRoute.shortName);
             }
             routeView.setDesc(currentRoute.stops.size() + " stops");
+            routeView.setFavorited(currentRoute.following);
 
             Random random = new Random(position); // seed so views keep the same color
             int currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt());
@@ -233,7 +246,7 @@ public class RoutesActivity extends AppCompatActivity {
             // make sure we get a dark color for the polyline
             if (colorMap.get(position) == null) {
                 while (!isColorDark(currentColor)) {
-                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt()*10);
+                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt()*10) | 0xFF000000;
                 }
                 colorMap.put(position, currentColor);
             } else {

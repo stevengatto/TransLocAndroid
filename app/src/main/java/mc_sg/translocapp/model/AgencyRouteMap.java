@@ -77,6 +77,8 @@ public class AgencyRouteMap extends HashMap<String, ArrayList<AgencyRouteMap.Rou
      */
     public class Route implements Serializable {
 
+        public boolean following;
+
         public String description;
 
         @SerializedName("short_name")

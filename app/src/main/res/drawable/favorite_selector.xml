@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:state_pressed="false"
-        android:drawable="@drawable/ic_favorite_border_white_36dp" /> <!-- pressed -->
-    <item
-        android:state_pressed="true"
-        android:drawable="@drawable/ic_favorite_white_36dp" /> <!-- focused -->
-    <item
-        android:state_enabled="false"
-        android:drawable="@drawable/ic_favorite_border_white_36dp"/>
-    <item
-        android:state_enabled="true"
+    <!-- currently pressed turning the toggle on -->
+    <item android:state_selected="true" android:state_pressed="true"
         android:drawable="@drawable/ic_favorite_white_36dp"/>
+    <!-- currently pressed turning the toggle off -->
+    <item android:state_pressed="true"
+        android:drawable="@drawable/ic_favorite_border_white_36dp"/>
+    <!-- not pressed default checked state -->
+    <item android:state_selected="true"
+        android:drawable="@drawable/ic_favorite_white_36dp"/>
+    <!-- default non-pressed non-checked -->
+    <item
+        android:drawable="@drawable/ic_favorite_border_white_36dp"/>
 </selector>

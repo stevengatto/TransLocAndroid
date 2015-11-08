@@ -1,87 +1,79 @@
-<android.support.design.widget.CoordinatorLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<com.sothree.slidinguppanel.SlidingUpPanelLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:sothree="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/sliding_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="mc_sg.translocapp.RouteActivity">
+    android:gravity="bottom"
+    sothree:umanoPanelHeight="68dp"
+    sothree:umanoShadowHeight="4dp"
+    sothree:umanoParallaxOffset="200dp">
 
-    <RelativeLayout
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        tools:context="mc_sg.translocapp.RouteActivity">
 
-        <android.support.design.widget.AppBarLayout
-            android:id="@+id/single_route_toolbar"
-            android:layout_height="wrap_content"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_alignParentTop="true"
-            android:theme="@style/AppTheme.AppBarOverlay">
+            android:layout_height="match_parent">
 
-            <android.support.v7.widget.Toolbar android:id="@+id/toolbar"
-                android:layout_width="match_parent" android:layout_height="?attr/actionBarSize"
-                android:background="?attr/colorPrimary" app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-        </android.support.design.widget.AppBarLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@id/single_route_toolbar"
-            android:orientation="vertical">
-
-            <fragment
-                android:id="@+id/single_route_map_fragment"
-                class="com.google.android.gms.maps.SupportMapFragment"
+            <android.support.design.widget.AppBarLayout
+                android:id="@+id/single_route_toolbar"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:layout_marginBottom="-5dp"
-                android:clipChildren="false"
-                android:clipToPadding="false"/>
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:theme="@style/AppTheme.AppBarOverlay">
+
+                <android.support.v7.widget.Toolbar
+                    android:id="@+id/toolbar"
+                    android:layout_width="match_parent"
+                    android:layout_height="?attr/actionBarSize"
+                    android:background="?attr/colorPrimary"
+                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+
+            </android.support.design.widget.AppBarLayout>
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:clipChildren="false"
-                android:clipToPadding="false">
+                android:layout_height="match_parent"
+                android:layout_below="@id/single_route_toolbar" >
 
-                <View
-                    android:id="@+id/single_route_card_shadow"
+                <fragment
+                    android:id="@+id/single_route_map_fragment"
+                    class="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
-                    android:layout_height="5dp"
-                    android:background="@drawable/top_shadow"
-                    android:layout_alignParentTop="true"/>
-
-                <android.support.v7.widget.CardView
-                    android:id="@+id/single_route_card"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_below="@id/single_route_card_shadow">
-
-                    <ListView
-                        android:id="@+id/single_route_info_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"/>
-
-                </android.support.v7.widget.CardView>
+                    android:layout_height="match_parent"/>
 
                 <android.support.design.widget.FloatingActionButton
-                    android:id="@+id/fab"
-                    android:layout_width="56dp"
-                    android:layout_height="56dp"
-                    android:layout_alignTop="@id/single_route_card"
-                    android:layout_marginTop="-28dp"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentEnd="true"
-                    android:layout_marginRight="24dp"
-                    android:layout_marginEnd="24dp"/>
+                        android:id="@+id/fab"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:layout_alignParentEnd="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginEnd="24dp"
+                        android:layout_marginRight="24dp"
+                        android:layout_marginBottom="24dp"
+                        android:src="@drawable/favorite_selector"/>
 
             </RelativeLayout>
 
-        </LinearLayout>
+        </RelativeLayout>
 
-    </RelativeLayout>
+    </android.support.design.widget.CoordinatorLayout>
 
-</android.support.design.widget.CoordinatorLayout>
+    <android.support.v7.widget.CardView
+        android:id="@+id/single_route_card"
+        android:layout_width="match_parent"
+        android:layout_height="400dp">
+
+        <ListView
+            android:id="@+id/single_route_info_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </android.support.v7.widget.CardView>
+
+</com.sothree.slidinguppanel.SlidingUpPanelLayout>

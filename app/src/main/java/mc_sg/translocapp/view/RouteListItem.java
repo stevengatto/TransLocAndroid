@@ -31,13 +31,14 @@ import java.util.Set;
 import mc_sg.translocapp.R;
 import mc_sg.translocapp.model.SegmentMap;
 
-public class RouteListItem extends RelativeLayout implements OnMapReadyCallback {
+public class RouteListItem extends RelativeLayout implements OnMapReadyCallback, GoogleMap.OnMapLoadedCallback {
 
     TextView tvTitle, tvDesc;
-    ImageView ivFavorite;
+    ImageView ivFavorite, ivNoMap;
     CardView card;
     Context context;
 
+    FrameLayout innerMapFrame;
     SegmentMap segmentMap;
     MapFragment mapFrag;
     GoogleMap map;
@@ -73,15 +74,17 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         tvTitle = (TextView) viewGroup.findViewById(R.id.item_route_list_title);
         tvDesc = (TextView) viewGroup.findViewById(R.id.item_route_list_desc);
         card = (CardView) viewGroup.findViewById(R.id.item_route_list_cardview);
+        ivNoMap = (ImageView) viewGroup.findViewById(R.id.item_route_list_no_image);
         ivFavorite = (ImageView) viewGroup.findViewById(R.id.item_route_list_favorite);
         ivFavorite.setTag(routeId); // tag the favorite button with the route id string
 
 
-        FrameLayout mapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
+        FrameLayout outerMapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
 
-        FrameLayout frame = new FrameLayout(context);
+        innerMapFrame = new FrameLayout(context);
+        innerMapFrame.setVisibility(INVISIBLE);
         int newId = (seed + 1) * 38943; // hopefully random hash? ID clash would be bad...
-        frame.setId(newId);
+        innerMapFrame.setId(newId);
 
         GoogleMapOptions options = new GoogleMapOptions();
         options.liteMode(true)
@@ -96,7 +99,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
         mapFrag = MapFragment.newInstance(options);
         mapFrag.getMapAsync(this);
 
-        mapFrame.addView(frame);
+        outerMapFrame.addView(innerMapFrame);
         FragmentManager fm = ((AppCompatActivity) context).getFragmentManager();
         fm.beginTransaction().add(newId, mapFrag).commit();
     }
@@ -104,12 +107,13 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        this.map = googleMap;
+        googleMap.setOnMapLoadedCallback(this);
+
         // no clicking on the map
         if (mapFrag.getView() != null) {
             mapFrag.getView().setClickable(false);
         }
-
-        this.map = googleMap;
 
         // setup
         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -140,6 +144,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
     private void initMap(SegmentMap segmentMap, int polylineColor) {
         if (mapFrag.getView() != null && mapFrag.getView().getVisibility() == INVISIBLE) {
             mapFrag.getView().setVisibility(VISIBLE);
+            ivNoMap.setVisibility(INVISIBLE);
         }
 
         map.clear();
@@ -172,6 +177,7 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
                 map.moveCamera(cameraUpdate);
             } else if (mapFrag.getView() != null) {
                 mapFrag.getView().setVisibility(INVISIBLE);
+                ivNoMap.setVisibility(VISIBLE);
             }
         }
     }
@@ -186,5 +192,20 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback 
 
     public void setBackgroundColor(int color) {
         card.setCardBackgroundColor(color);
+    }
+
+    public void setFavorited(boolean favorited) {
+        ivFavorite.setSelected(favorited);
+    }
+
+    public boolean getFavorited() {
+        return ivFavorite.isSelected();
+    }
+
+    @Override
+    public void onMapLoaded() {
+        // hide progress bar forever once map loads
+        findViewById(R.id.item_route_list_map_progress).setVisibility(INVISIBLE);
+        innerMapFrame.setVisibility(VISIBLE);
     }
 }

@@ -1,6 +1,7 @@
 package mc_sg.translocapp;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -28,6 +29,7 @@ import com.google.maps.android.PolyUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -80,22 +82,11 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         cardView.setCardBackgroundColor(color);
 
         favorite = (FloatingActionButton) findViewById(R.id.fab);
-        favorite.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ApiUtil.getTransLocApi().getVehicles(agencyId, null, route.routeId, new VehiclesCallback(context));
-            }
-        });
+        favorite.setOnClickListener(new FavoriteClickListener());
+        favorite.setSelected(route.following);
 
         stopList = (ListView) findViewById(R.id.single_route_info_list);
-
     }
-
-//    public static String getTime(String ISOString, Context context) {
-//        Date now = new Date();
-//        Date date = new DateTime(ISOString).toDate();
-//        DateUtils.formatDateRange(context, date.getTime(), now.getTime(), 1);
-//    }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
@@ -274,6 +265,32 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         @Override
         public boolean isEmpty() {
             return getArrivals().isEmpty();
+        }
+    }
+
+    private class FavoriteClickListener implements View.OnClickListener {
+
+        @Override
+        public void onClick(View view) {
+            SharedPreferences prefs = context.getSharedPreferences(RoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
+            Set<String> routes = prefs.getStringSet(RoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+
+            if (!routes.isEmpty() && routes.contains(route.routeId)) {
+                routes.remove(route.routeId);
+                Toast.makeText(context, "Route has been removed!", Toast.LENGTH_SHORT).show();
+                route.following = false;
+                view.setSelected(false);
+
+            } else {
+                routes.add(route.routeId);
+                Toast.makeText(context, "Route has been added!", Toast.LENGTH_SHORT).show();
+                route.following = true;
+                view.setSelected(true);
+            }
+
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putStringSet(RoutesActivity.KEY_PREFS_FAV_ROUTES, routes);
+            editor.apply();
         }
     }
 
