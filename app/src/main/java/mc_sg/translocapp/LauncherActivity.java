@@ -18,7 +18,7 @@ public class LauncherActivity extends Activity {
         String agencyId = prefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_ID, null);
         if (agencyId != null) {
             // launch list activity with param of agency id
-            Intent routesIntent = new Intent(this, RoutesActivity.class);
+            Intent routesIntent = new Intent(this, ActiveRoutesActivity.class);
             Bundle data = new Bundle();
             data.putString(KEY_AGENCY_ID, agencyId);
             routesIntent.putExtras(data);

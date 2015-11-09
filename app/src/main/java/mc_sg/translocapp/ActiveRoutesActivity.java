@@ -31,7 +31,7 @@ import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.RouteListItem;
 import retrofit.RetrofitError;
 
-public class RoutesActivity extends AppCompatActivity {
+public class ActiveRoutesActivity extends AppCompatActivity {
 
     public static final String PREFS_FAVORITES = "favorites_prefs";
     public static final String KEY_PREFS_FAV_ROUTES = "key_favorite_routes";
@@ -99,7 +99,7 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError retrofitError) {
-            Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "An error has occurred, trying again...", Toast.LENGTH_SHORT).show();
             ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(context));
         }
 
@@ -135,7 +135,7 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError retrofitError) {
-            Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
+            Toast.makeText(context, "An error has occurred, trying again...", Toast.LENGTH_SHORT).show();
             ApiUtil.getTransLocApi().getSegments(agencyId, null, routeId,
                     new SegmentsCallback(context, routeId));
         }
@@ -192,12 +192,12 @@ public class RoutesActivity extends AppCompatActivity {
 
                 if (!routes.isEmpty() && routes.contains(routeId)) {
                     routes.remove(routeId);
-                    notify("Route has been removed!").show();
+                    notify("Route removed from favorites!").show();
                     view.setSelected(false);
 
                 } else {
                     routes.add(routeId);
-                    notify("Route has been added!").show();
+                    notify("Route added to favorites!").show();
                     view.setSelected(true);
                 }
 
@@ -213,7 +213,7 @@ public class RoutesActivity extends AppCompatActivity {
             }
 
             public Toast notify(String text) {
-                return Toast.makeText(context, text, Toast.LENGTH_LONG);
+                return Toast.makeText(context, text, Toast.LENGTH_SHORT);
             }
 
         }

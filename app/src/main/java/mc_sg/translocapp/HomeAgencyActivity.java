@@ -311,7 +311,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putString(KEY_PREFS_AGENCY_ID, homeAgency.agencyId);
                                     editor.apply();
-                                    startActivity(new Intent(context, RoutesActivity.class));
+                                    startActivity(new Intent(context, ActiveRoutesActivity.class));
                                     finish();
                                     break;
                                 case DialogInterface.BUTTON_NEGATIVE:

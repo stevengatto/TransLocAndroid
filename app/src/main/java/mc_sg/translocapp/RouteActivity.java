@@ -376,8 +376,8 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
         @Override
         public void onClick(View view) {
-            SharedPreferences prefs = context.getSharedPreferences(RoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
-            Set<String> routes = prefs.getStringSet(RoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+            SharedPreferences prefs = context.getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
+            Set<String> routes = prefs.getStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
             if (!routes.isEmpty() && routes.contains(route.routeId)) {
                 routes.remove(route.routeId);
@@ -393,7 +393,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
             }
 
             SharedPreferences.Editor editor = prefs.edit();
-            editor.putStringSet(RoutesActivity.KEY_PREFS_FAV_ROUTES, routes);
+            editor.putStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, routes);
             editor.apply();
         }
     }

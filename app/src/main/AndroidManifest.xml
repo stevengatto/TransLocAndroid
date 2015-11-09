@@ -26,7 +26,7 @@
             android:value="AIzaSyC587x7oUC2JmHtXVqFjjzJ11Fo_b6CGKc" />
 
         <activity
-            android:name=".RoutesActivity"
+            android:name=".ActiveRoutesActivity"
             android:label="@string/title_activity_routes"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
