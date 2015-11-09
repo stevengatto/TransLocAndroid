@@ -67,7 +67,7 @@ public class ActiveRoutesActivity extends AppCompatActivity {
             if (routes.isEmpty()) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setMessage("You have not selected any routes. Click on the heart to favorite a route!")
-                        .setPositiveButton("OK",null)
+                        .setPositiveButton("OK", null)
                         .show();
             } else {
                 Intent mapIntent = new Intent(this, FavoriteRoutesActivity.class);
@@ -236,7 +236,7 @@ public class ActiveRoutesActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new RouteListItem(context, position, activeRoutes.get(position).routeId);
+                convertView = new RouteListItem(context, position);
                 convertView
                         .findViewById(R.id.item_route_list_favorite)
                         .setOnClickListener(new FavoriteBtnListener());
@@ -267,6 +267,7 @@ public class ActiveRoutesActivity extends AppCompatActivity {
 
             routeView.setBackgroundColor(currentColor); // remove alpha
             routeView.setupMap(activeSegments.get(currentRoute.routeId), currentColor);
+            routeView.setRouteId(activeRoutes.get(position).routeId);
             return routeView;
         }
 

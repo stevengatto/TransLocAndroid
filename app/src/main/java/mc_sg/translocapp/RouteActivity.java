@@ -381,13 +381,13 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
             if (!routes.isEmpty() && routes.contains(route.routeId)) {
                 routes.remove(route.routeId);
-                Toast.makeText(context, "Route has been removed!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Route removed from favorites!", Toast.LENGTH_SHORT).show();
                 route.following = false;
                 view.setSelected(false);
 
             } else {
                 routes.add(route.routeId);
-                Toast.makeText(context, "Route has been added!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Route added to favorites!", Toast.LENGTH_SHORT).show();
                 route.following = true;
                 view.setSelected(true);
             }

@@ -45,22 +45,22 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback,
     int polylineColor;
 
     public RouteListItem(Context context) {
-        this(context, -1, null);
+        this(context, -1);
     }
 
     public RouteListItem(Context context, AttributeSet attrs) {
-        this(context, -1, null);
+        this(context, -1);
     }
 
     public RouteListItem(Context context, AttributeSet attrs, int defStyleAttr) {
-        this(context, -1, null);
+        this(context, -1);
     }
 
     public RouteListItem(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        this(context, -1, null);
+        this(context, -1);
     }
 
-    public RouteListItem(Context context, int seed, String routeId) {
+    public RouteListItem(Context context, int seed) {
         super(context);
         this.context = context;
 
@@ -76,7 +76,6 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback,
         card = (CardView) viewGroup.findViewById(R.id.item_route_list_cardview);
         ivNoMap = (ImageView) viewGroup.findViewById(R.id.item_route_list_no_image);
         ivFavorite = (ImageView) viewGroup.findViewById(R.id.item_route_list_favorite);
-        ivFavorite.setTag(routeId); // tag the favorite button with the route id string
 
 
         FrameLayout outerMapFrame = (FrameLayout) viewGroup.findViewById(R.id.item_route_list_map_frame);
@@ -207,5 +206,9 @@ public class RouteListItem extends RelativeLayout implements OnMapReadyCallback,
         // hide progress bar forever once map loads
         findViewById(R.id.item_route_list_map_progress).setVisibility(INVISIBLE);
         innerMapFrame.setVisibility(VISIBLE);
+    }
+
+    public void setRouteId(String id) {
+        ivFavorite.setTag(id); // tag the favorite button with the route id string
     }
 }

@@ -43,9 +43,6 @@ import retrofit.RetrofitError;
  */
 public class FavoriteRoutesActivity extends AppCompatActivity {
 
-    public static final String PREFS_FAVORITES = "favorites_prefs";
-    public static final String KEY_PREFS_FAV_ROUTES = "key_favorite_routes";
-
     private int segmentsReceived = 0;
     private Map<String, SegmentMap> activeSegments = new HashMap<>();
 
@@ -172,8 +169,8 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
             List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
             favoriteRoutes = new ArrayList<>();
 
-            SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
-            Set<String> routeIds = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+            SharedPreferences prefs = context.getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
+            Set<String> routeIds = prefs.getStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
             for (AgencyRouteMap.Route route : routes) {
                 if (favRouteIds.contains(route.routeId)) {
@@ -250,22 +247,21 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 String routeId = (String) view.getTag();
-                SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
-                Set<String> routes = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+                SharedPreferences prefs = context.getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
 
-                if (!routes.isEmpty() && routes.contains(routeId)) {
-                    routes.remove(routeId);
+                if (!favRouteIds.isEmpty() && favRouteIds.contains(routeId)) {
+                    favRouteIds.remove(routeId);
                     notify("Route removed from favorites!").show();
                     view.setSelected(false);
 
                 } else {
-                    routes.add(routeId);
+                    favRouteIds.add(routeId);
                     notify("Route added to favorites!").show();
                     view.setSelected(true);
                 }
 
                 SharedPreferences.Editor editor = prefs.edit();
-                editor.putStringSet(KEY_PREFS_FAV_ROUTES, routes);
+                editor.putStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, favRouteIds);
                 editor.apply();
 
                 for (AgencyRouteMap.Route route : favoriteRoutes) {
@@ -283,7 +279,7 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new RouteListItem(context, position, favoriteRoutes.get(position).routeId);
+                convertView = new RouteListItem(context, position);
                 convertView
                         .findViewById(R.id.item_route_list_favorite)
                         .setOnClickListener(new FavoriteBtnListener());
@@ -314,6 +310,7 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
 
             routeView.setBackgroundColor(currentColor); // remove alpha
             routeView.setupMap(activeSegments.get(currentRoute.routeId), currentColor);
+            routeView.setRouteId(favoriteRoutes.get(position).routeId);
             return routeView;
         }
 
