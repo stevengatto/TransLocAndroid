@@ -22,13 +22,13 @@ public class LauncherActivity extends Activity {
         SharedPreferences favRoutePrefs = getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, MODE_PRIVATE);
         Set<String> favRouteIds = favRoutePrefs.getStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, null);
 
-        if (agencyId == null) {
+        if (agencyId == null || agencyId.isEmpty()) {
             // wipe out old favorites
             favRoutePrefs.edit().putStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, null).apply();
 
             Intent mapIntent = new Intent(this, HomeAgencyActivity.class);
             startActivity(mapIntent);
-        } else if (favRouteIds == null) {
+        } else if (favRouteIds == null || favRouteIds.isEmpty()) {
             // launch list activity with param of agency id
             Intent routesIntent = new Intent(this, ActiveRoutesActivity.class);
             Bundle data = new Bundle();
