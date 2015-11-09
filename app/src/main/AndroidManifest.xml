@@ -27,13 +27,19 @@
 
         <activity
             android:name=".ActiveRoutesActivity"
-            android:label="@string/title_activity_routes"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
+            android:label="@string/title_activity_active_routes"
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <activity
+            android:name=".FavoriteRoutesActivity"
+            android:label="@string/title_activity_favorite_routes"
+            android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".HomeAgencyActivity"
             android:label="@string/title_activity_home_agency"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".RouteActivity"
             android:label="@string/title_activity_route"

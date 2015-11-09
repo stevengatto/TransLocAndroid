@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/map_get_agencies"
-        android:icon="@drawable/ic_public_white_36dp"
-        android:title="Refresh"
+        android:id="@+id/favorites_done"
+        android:title="DONE"
         app:showAsAction="always" />
 </menu>

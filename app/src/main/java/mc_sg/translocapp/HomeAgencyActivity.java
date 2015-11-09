@@ -51,6 +51,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
 
     public static final String PREFS_HOME_AGENCY = "home_agency_prefs"; // key for sharedprefs
     public static final String KEY_PREFS_AGENCY_ID = "key_home_agency_id"; // key for id in sharedprefs
+    public static final String KEY_PREFS_AGENCY_NAME = "key_home_agency_name"; // key for id in sharedprefs
 
     private Activity context;
     private TourGuide tourGuideHandler;
@@ -307,9 +308,12 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                             switch (which) {
                                 case DialogInterface.BUTTON_POSITIVE:
                                     // update the users preferences when they set a home agency
+                                    String name = (homeAgency.shortName == null || homeAgency.shortName.isEmpty()) ?
+                                            homeAgency.longName : homeAgency.shortName;
                                     SharedPreferences prefs = context.getSharedPreferences(PREFS_HOME_AGENCY, Context.MODE_PRIVATE);
                                     SharedPreferences.Editor editor = prefs.edit();
                                     editor.putString(KEY_PREFS_AGENCY_ID, homeAgency.agencyId);
+                                    editor.putString(KEY_PREFS_AGENCY_NAME, name);
                                     editor.apply();
                                     startActivity(new Intent(context, ActiveRoutesActivity.class));
                                     finish();

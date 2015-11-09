@@ -7,11 +7,9 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -33,7 +31,12 @@ import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.RouteListItem;
 import retrofit.RetrofitError;
 
-public class ActiveRoutesActivity extends AppCompatActivity {
+/**
+ * Nearly exact copy of ActiveRoutsActivity, if I had more time I would
+ * DRY this out. Maybe later. The activity only displays routes that are
+ * favorited in sharedprefs.
+ */
+public class FavoriteRoutesActivity extends AppCompatActivity {
 
     public static final String PREFS_FAVORITES = "favorites_prefs";
     public static final String KEY_PREFS_FAV_ROUTES = "key_favorite_routes";
@@ -43,55 +46,53 @@ public class ActiveRoutesActivity extends AppCompatActivity {
 
     private ListView listView;
     private View listProgress;
-    private String agencyId;
+    private String agencyId, agencyName;
+    private Set<String> favRouteIds;
     private Context context;
 
-    private List<AgencyRouteMap.Route> activeRoutes;
+    private List<AgencyRouteMap.Route> favoriteRoutes;
     Map<Integer, Integer> colorMap = new HashMap<>();
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_active_routes, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle item selection
-        if (item.getItemId() ==  R.id.favorites_done ) {
-            Intent mapIntent = new Intent(this, FavoriteRoutesActivity.class);
-            startActivity(mapIntent);
-            finish();
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        loadPreferences();
+
         setContentView(R.layout.activity_routes);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Select Favorite Routes");
+        toolbar.setTitle("Favorites" + (!agencyName.isEmpty() ? " - " + agencyName : ""));
         setSupportActionBar(toolbar);
-
-        // get agency id from bundle or shared prefs
-        Bundle extras = getIntent().getExtras();
-        if (extras != null) {
-            agencyId = extras.getString(LauncherActivity.KEY_AGENCY_ID);
-        } else {
-            SharedPreferences prefs = getSharedPreferences(HomeAgencyActivity.PREFS_HOME_AGENCY, MODE_PRIVATE);
-            agencyId = prefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_ID, null);
-        }
 
         ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(this));
 
         // R aggregates xml data to interface with.
         listView = (ListView) findViewById(R.id.routes_listview);
+        listView.setOnItemClickListener(new OnRouteClick());
         listProgress = findViewById(R.id.routes_list_progress_card);
+    }
+
+    private void loadPreferences() {
+        SharedPreferences agencyPrefs = getSharedPreferences(HomeAgencyActivity.PREFS_HOME_AGENCY, MODE_PRIVATE);
+        agencyId = agencyPrefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_ID, "");
+        agencyName = agencyPrefs.getString(HomeAgencyActivity.KEY_PREFS_AGENCY_NAME, "");
+
+        SharedPreferences routesPrefs = getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, MODE_PRIVATE);
+        favRouteIds = routesPrefs.getStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+    }
+
+    private class OnRouteClick implements AdapterView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            AgencyRouteMap.Route route = favoriteRoutes.get(position);
+            Intent intent = new Intent(context, RouteActivity.class);
+            Bundle data = new Bundle();
+            data.putSerializable(RouteActivity.KEY_ROUTE, route);
+            data.putSerializable(RouteActivity.KEY_ROUTE_SEGMENTS, activeSegments.get(route.routeId));
+            data.putInt(RouteActivity.KEY_COLOR, colorMap.get(position));
+            intent.putExtras(data);
+            startActivity(intent);
+        }
     }
 
     private class RoutesCallback extends ApiUtil.RetroCallback<Response<AgencyRouteMap>> {
@@ -112,14 +113,14 @@ public class ActiveRoutesActivity extends AppCompatActivity {
         public void success(Response<AgencyRouteMap> agencyRouteMapResponse, retrofit.client.Response response) {
 
             List<AgencyRouteMap.Route> routes = agencyRouteMapResponse.data.getRoutes(agencyId);
-            activeRoutes = new ArrayList<>();
+            favoriteRoutes = new ArrayList<>();
 
             SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
             Set<String> routeIds = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
             for (AgencyRouteMap.Route route : routes) {
-                if (route.isActive) {
-                    activeRoutes.add(route);
+                if (favRouteIds.contains(route.routeId)) {
+                    favoriteRoutes.add(route);
                     ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
                             new SegmentsCallback(context, route.routeId));
                     route.following = routeIds.contains(route.routeId);
@@ -150,9 +151,9 @@ public class ActiveRoutesActivity extends AppCompatActivity {
             segmentsReceived += 1;
             activeSegments.put(routeId, segmentMapResponse.data);
 
-            if (segmentsReceived == activeRoutes.size()) {
+            if (segmentsReceived == favoriteRoutes.size()) {
                 listProgress.setVisibility(View.INVISIBLE);
-                listView.setAdapter(new RouteAdapter(context, activeRoutes, activeSegments));
+                listView.setAdapter(new RouteAdapter(context, favoriteRoutes, activeSegments));
             }
         }
     }
@@ -210,7 +211,7 @@ public class ActiveRoutesActivity extends AppCompatActivity {
                 editor.putStringSet(KEY_PREFS_FAV_ROUTES, routes);
                 editor.apply();
 
-                for (AgencyRouteMap.Route route : activeRoutes) {
+                for (AgencyRouteMap.Route route : favoriteRoutes) {
                     if (route.routeId.equals(routeId)) {
                         route.following = !route.following;
                     }
@@ -225,7 +226,7 @@ public class ActiveRoutesActivity extends AppCompatActivity {
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             if (convertView == null) {
-                convertView = new RouteListItem(context, position, activeRoutes.get(position).routeId);
+                convertView = new RouteListItem(context, position, favoriteRoutes.get(position).routeId);
                 convertView
                         .findViewById(R.id.item_route_list_favorite)
                         .setOnClickListener(new FavoriteBtnListener());
