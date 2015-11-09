@@ -34,7 +34,53 @@
                     android:layout_width="match_parent"
                     android:layout_height="?attr/actionBarSize"
                     android:background="?attr/colorPrimary"
-                    app:popupTheme="@style/AppTheme.PopupOverlay" />
+                    app:popupTheme="@style/AppTheme.PopupOverlay">
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingEnd="16dp"
+                        android:paddingRight="16dp">
+
+                        <FrameLayout
+                            android:id="@+id/route_toolbar_refresh"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_centerVertical="true"
+                            android:layout_alignParentEnd="true"
+                            android:layout_alignParentRight="true">
+
+                            <ImageView
+                                android:id="@+id/route_toolbar_refresh_iv"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="fitCenter"
+                                android:src="@drawable/ic_refresh_white_36dp"
+                                android:visibility="invisible"/>
+
+                            <ProgressBar
+                                android:id="@+id/route_toolbar_refresh_progress"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:visibility="visible"/>
+
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/route_toolbar_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_alignParentStart="true"
+                            android:layout_toLeftOf="@id/home_toolbar_refresh"
+                            android:layout_toStartOf="@id/home_toolbar_refresh"
+                            android:layout_centerVertical="true"
+                            android:textColor="@android:color/white"
+                            android:textSize="20sp"/>
+
+                    </RelativeLayout>
+
+                </android.support.v7.widget.Toolbar>
 
             </android.support.design.widget.AppBarLayout>
 

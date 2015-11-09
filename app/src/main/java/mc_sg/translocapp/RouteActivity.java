@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -51,6 +52,7 @@ import mc_sg.translocapp.model.Response;
 import mc_sg.translocapp.model.Stop;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.ArrivalEstimateView;
+import retrofit.RetrofitError;
 
 public class RouteActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -67,6 +69,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
     private FloatingActionButton favorite;
     private LinearLayout cardView;
     private ListView stopList;
+    private View refreshFrame, refreshProgress, refreshBtn;
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private List<LatLng> polyPoints = new ArrayList<>();
@@ -85,9 +88,9 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         agencyId = Integer.valueOf(route.agencyId).toString();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle((route.shortName == null
-                || route.shortName.isEmpty() ? route.longName : route.shortName));
         setSupportActionBar(toolbar);
+        ((TextView) toolbar.findViewById(R.id.route_toolbar_title)).setText((route.shortName == null
+                || route.shortName.isEmpty() ? route.longName : route.shortName));
 
         ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.single_route_map_fragment)).getMapAsync(this);
@@ -100,6 +103,11 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         favorite.setSelected(route.following);
 
         stopList = (ListView) findViewById(R.id.single_route_info_list);
+
+        refreshFrame = findViewById(R.id.route_toolbar_refresh);
+        refreshProgress = findViewById(R.id.route_toolbar_refresh_progress);
+        refreshBtn = findViewById(R.id.route_toolbar_refresh_iv);
+        refreshBtn.setOnClickListener(new OnRefreshClick());
     }
 
     @Override
@@ -160,6 +168,17 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         }
     }
 
+    private class OnRefreshClick implements View.OnClickListener {
+
+        @Override
+        public void onClick(View v) {
+            ApiUtil.getTransLocApi().getVehicles(agencyId, null, route.routeId,
+                    new VehiclesCallback(context));
+            refreshBtn.setVisibility(View.INVISIBLE);
+            refreshProgress.setVisibility(View.VISIBLE);
+        }
+    }
+
     private class VehiclesCallback extends ApiUtil.RetroCallback<Response<AgencyVehicleMap>> {
 
         Bitmap busIcon;
@@ -170,6 +189,13 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
             int width = HomeAgencyActivity.getPixelsFromDp(context, 36f);
             int height = HomeAgencyActivity.getPixelsFromDp(context, 42f);
             busIcon = Bitmap.createScaledBitmap(origIcon, width, height, false);
+        }
+
+        @Override
+        public void failure(RetrofitError retrofitError) {
+            super.failure(retrofitError);
+            refreshBtn.setVisibility(View.VISIBLE);
+            refreshProgress.setVisibility(View.INVISIBLE);
         }
 
         @Override
@@ -197,23 +223,17 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 }
             }
 
-            boolean someOffScreen = false;
             boolean allOffScreen = true;
             LatLngBounds visibleBounds = map.getProjection().getVisibleRegion().latLngBounds;
             for (LatLng point : vehiclePoints) {
-                if (!visibleBounds.contains(point)) {
-                    someOffScreen = true;
-                } else {
+                if (visibleBounds.contains(point)) {
                     allOffScreen = false;
                 }
             }
 
             if (allOffScreen) {
                 Toast.makeText(context, "All buses are located off-screen", Toast.LENGTH_SHORT).show();
-            } else if (someOffScreen) {
-                Toast.makeText(context, "Some buses are located off-screen", Toast.LENGTH_SHORT).show();
             }
-
         }
 
         private void createStopArrivalsMap(AgencyVehicleMap vehicleMap) {
@@ -243,6 +263,13 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         }
 
         @Override
+        public void failure(RetrofitError retrofitError) {
+            super.failure(retrofitError);
+            refreshBtn.setVisibility(View.VISIBLE);
+            refreshProgress.setVisibility(View.INVISIBLE);
+        }
+
+        @Override
         public void success(Response<List<Stop>> listResponse, retrofit.client.Response response) {
             stopNames.clear();
             for (Stop stop : listResponse.data) {
@@ -253,6 +280,8 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                     }
                 }
             }
+            refreshBtn.setVisibility(View.VISIBLE);
+            refreshProgress.setVisibility(View.INVISIBLE);
             stopList.setAdapter(new ArrivalAdapter(context, stopNames));
         }
     }
@@ -326,7 +355,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 int hours = minutes/60;
                 int days = hours/24;
 
-                if (minutes >= 0 && minutes < 2) {
+                if (minutes < 2) {
                     return "1 minute";
                 } else if (minutes >= 2 && minutes < 60){
                     return minutes + " minutes";

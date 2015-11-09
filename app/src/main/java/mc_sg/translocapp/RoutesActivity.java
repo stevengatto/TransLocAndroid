@@ -11,12 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.amulyakhare.textdrawable.TextDrawable;
 import com.amulyakhare.textdrawable.util.ColorGenerator;
 
 import java.util.ArrayList;
@@ -102,9 +99,8 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError retrofitError) {
-            super.failure(retrofitError);
             Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
-            // TODO: retry routes request here
+            ApiUtil.getTransLocApi().getRoutes(agencyId, null, new RoutesCallback(context));
         }
 
         @Override
@@ -139,9 +135,9 @@ public class RoutesActivity extends AppCompatActivity {
 
         @Override
         public void failure(RetrofitError retrofitError) {
-            super.failure(retrofitError);
             Toast.makeText(context, "An error has occurred. Trying again.", Toast.LENGTH_LONG).show();
-            // TODO: retry specific route segment request here with "routeId"
+            ApiUtil.getTransLocApi().getSegments(agencyId, null, routeId,
+                    new SegmentsCallback(context, routeId));
         }
 
         @Override
