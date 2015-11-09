@@ -10,7 +10,9 @@
     android:layout_marginEnd="16dp"
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:clipChildren="false"
+    android:clipToPadding="false">
 
     <TextView
         android:id="@+id/arr_est_stop_name"
@@ -19,36 +21,50 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:layout_marginBottom="4dp"
-        android:text="Mass Ave."
-        android:textColor="@android:color/white"
-        android:textSize="24sp"
+        android:layout_marginBottom="12dp"
+        android:gravity="center_horizontal"
+        android:text="Stop Name Unknown"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
         android:singleLine="true"
         android:maxLines="1"
+        android:textStyle="bold"
         android:ellipsize="marquee"/>
+
+    <View
+        android:id="@+id/arr_est_stop_name_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="12dp"
+        android:layout_marginLeft="-12dp"
+        android:layout_marginStart="-12dp"
+        android:layout_marginRight="-12dp"
+        android:layout_marginEnd="-12dp"
+        android:layout_below="@id/arr_est_stop_name"
+        android:background="@android:color/white"/>
 
     <ImageView
         android:id="@+id/arr_est_clock"
-        android:layout_width="36dp"
-        android:layout_height="36dp"
-        android:layout_below="@id/arr_est_stop_name"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_below="@id/arr_est_stop_name_separator"
+        android:scaleType="fitCenter"
         android:src="@drawable/ic_schedule_white_36dp" />
 
     <TextView
         android:id="@+id/arr_est_time"
         android:layout_width="wrap_content"
-        android:layout_height="36dp"
+        android:layout_height="32dp"
         android:layout_toEndOf="@id/arr_est_clock"
         android:layout_toRightOf="@id/arr_est_clock"
-        android:layout_below="@id/arr_est_stop_name"
-        android:layout_marginLeft="16dp"
-        android:layout_marginStart="16dp"
+        android:layout_below="@id/arr_est_stop_name_separator"
+        android:layout_marginLeft="12dp"
+        android:layout_marginStart="12dp"
         android:gravity="start|center_vertical"
         android:ellipsize="marquee"
         android:maxLines="1"
-        android:text="10:45pm"
-        android:textColor="@android:color/white"
-        android:textSize="18sp"
-        android:textStyle="bold" />
+        android:text="N/A"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp" />
 
 </RelativeLayout>

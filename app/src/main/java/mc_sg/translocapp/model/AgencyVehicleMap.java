@@ -58,13 +58,13 @@ public class AgencyVehicleMap extends HashMap<String, List<AgencyVehicleMap.Vehi
         public String description;
 
         @SerializedName("passenger_load")
-        public String passengerLoad;
+        public int passengerLoad;
 
         @SerializedName("standing_capacity")
-        public String standingCapacity;
+        public int standingCapacity;
 
         @SerializedName("seating_capacity")
-        public String seatingCapacity;
+        public int seatingCapacity;
 
         @SerializedName("last_updated_on")
         public String lastUpdatedOn;
@@ -72,7 +72,7 @@ public class AgencyVehicleMap extends HashMap<String, List<AgencyVehicleMap.Vehi
         @SerializedName("call_name")
         public String callName;
 
-        public int speed;
+        public double speed;
 
         @SerializedName("vehicle_id")
         public String vehicleId;

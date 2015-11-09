@@ -12,7 +12,6 @@ import mc_sg.translocapp.R;
 
 public class ArrivalEstimateView extends FrameLayout {
 
-    String text;
     TextView tvName;
     TextView tvTime;
 
@@ -36,11 +35,11 @@ public class ArrivalEstimateView extends FrameLayout {
     }
 
 
-    public void setTimeString(String realTime) {
+    public void setTimeString(CharSequence realTime) {
         tvTime.setText(realTime);
     }
 
-    public void setName(String name) {
+    public void setName(CharSequence name) {
         tvName.setText(name);
     }
 

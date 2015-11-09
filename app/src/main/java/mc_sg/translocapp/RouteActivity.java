@@ -2,12 +2,13 @@ package mc_sg.translocapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.LinearGradient;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,6 +22,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -29,17 +32,23 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import mc_sg.translocapp.model.AgencyRouteMap;
 import mc_sg.translocapp.model.AgencyVehicleMap;
-import mc_sg.translocapp.model.ArrivalEstimate;
 import mc_sg.translocapp.model.Response;
+import mc_sg.translocapp.model.Stop;
 import mc_sg.translocapp.network.ApiUtil;
 import mc_sg.translocapp.view.ArrivalEstimateView;
 
@@ -61,6 +70,8 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
     private ArrayList<Marker> markers = new ArrayList<>();
     private List<LatLng> polyPoints = new ArrayList<>();
+    private Map<String, AgencyVehicleMap.Vehicle.Estimate> stopArrivalMap = new HashMap<>();
+    private Map<String, String> stopNames = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,10 +154,6 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                         // Get Vehicle locations
                         ApiUtil.getTransLocApi().getVehicles(agencyId, null, route.routeId,
                                 new VehiclesCallback(context));
-
-                        // Get arrival estimates
-                        ApiUtil.getTransLocApi().getArrivalEstimates(agencyId, route.routeId,
-                                ApiUtil.formatCsv(route.stops), new ArrivalCallback(context));
                     }
                 });
             }
@@ -155,12 +162,19 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
     private class VehiclesCallback extends ApiUtil.RetroCallback<Response<AgencyVehicleMap>> {
 
+        Bitmap busIcon;
+
         public VehiclesCallback(Context context) {
             super(context);
+            Bitmap origIcon = BitmapFactory.decodeResource(getResources(), R.drawable.bus_marker);
+            int width = HomeAgencyActivity.getPixelsFromDp(context, 36f);
+            int height = HomeAgencyActivity.getPixelsFromDp(context, 42f);
+            busIcon = Bitmap.createScaledBitmap(origIcon, width, height, false);
         }
 
         @Override
         public void success(Response<AgencyVehicleMap> vehicleResponse, retrofit.client.Response response) {
+            createStopArrivalsMap(vehicleResponse.data);
             // clear markers
             for (Marker marker : markers) {
                 marker.remove();
@@ -172,12 +186,12 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
             if (vehicles != null) {
                 for (AgencyVehicleMap.Vehicle vehicle : vehicles) {
                     if (vehicle.routeId.equals(route.routeId)) { // always should but the API has surprised me before
-//                        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.bus_marker);
+                        BitmapDescriptor icon = BitmapDescriptorFactory.fromBitmap(busIcon);
                         LatLng latLng = new LatLng(Double.parseDouble(vehicle.location.lat),
                                 Double.parseDouble(vehicle.location.lng));
                         vehiclePoints.add(latLng);
 
-                        Marker marker = map.addMarker(new MarkerOptions().position(latLng));
+                        Marker marker = map.addMarker(new MarkerOptions().position(latLng).icon(icon));
                         markers.add(marker);
                     }
                 }
@@ -201,50 +215,70 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
             }
 
         }
+
+        private void createStopArrivalsMap(AgencyVehicleMap vehicleMap) {
+            stopArrivalMap.clear();
+
+            for (AgencyVehicleMap.Vehicle vehicle : vehicleMap.getVehicles(agencyId)) {
+                for (AgencyVehicleMap.Vehicle.Estimate estimate : vehicle.arrivalEstimates) {
+                    if (!stopArrivalMap.containsKey(estimate.stopId)) {
+                        stopArrivalMap.put(estimate.stopId, estimate);
+                    } else {
+                        AgencyVehicleMap.Vehicle.Estimate savedEstimate = stopArrivalMap.get(estimate.stopId);
+                        if (savedEstimate.arrivalAt.compareTo(estimate.arrivalAt) == 1) {
+                            stopArrivalMap.put(estimate.stopId, estimate);
+                        }
+                    }
+                }
+            }
+
+            ApiUtil.getTransLocApi().getStops(agencyId, null, new StopsCallback(context));
+        }
     }
 
-    private class ArrivalCallback extends ApiUtil.RetroCallback<Response<List<ArrivalEstimate>>> {
+    private class StopsCallback extends ApiUtil.RetroCallback<Response<List<Stop>>> {
 
-        public ArrivalCallback(Context context) {
+        public StopsCallback(Context context) {
             super(context);
         }
 
         @Override
-        public void success(Response<List<ArrivalEstimate>> listResponse, retrofit.client.Response response) {
-            List<ArrivalEstimate> list = new ArrayList<>();
-            list.add(new ArrivalEstimate());
-            list.add(new ArrivalEstimate());
-            list.add(new ArrivalEstimate());
-            list.add(new ArrivalEstimate());
-            list.add(new ArrivalEstimate());
-            list.add(new ArrivalEstimate());
-
-            stopList.setAdapter(new ArrivalAdapter(context, list));
+        public void success(Response<List<Stop>> listResponse, retrofit.client.Response response) {
+            stopNames.clear();
+            for (Stop stop : listResponse.data) {
+                for (String routeId : stop.routes) {
+                    // if only the stops for this route, and only add once
+                    if (routeId.equals(route.routeId) && stopNames.get(stop.stopId) == null){
+                        stopNames.put(stop.stopId, stop.name);
+                    }
+                }
+            }
+            stopList.setAdapter(new ArrivalAdapter(context, stopNames));
         }
     }
 
     private class ArrivalAdapter extends BaseAdapter {
 
-        private final List<ArrivalEstimate> arrivals;
+        private final Map<String, String> stops;
         private final Context context;
 
-        public ArrivalAdapter(Context context, List<ArrivalEstimate> arrivals) {
-            this.arrivals = arrivals;
+        public ArrivalAdapter(Context context, Map<String, String> stops) {
+            this.stops = stops;
             this.context = context;
         }
 
-        protected List<ArrivalEstimate> getArrivals() {
-            return arrivals;
+        protected Map<String, String> getStops() {
+            return stops;
         }
 
         @Override
         public int getCount() {
-            return getArrivals().size();
+            return getStops().size();
         }
 
         @Override
         public Object getItem(int position) {
-            return getArrivals().get(position);
+            return getStops().get(position);
         }
 
         @Override
@@ -258,11 +292,17 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
                 convertView =  new ArrivalEstimateView(context);
             }
 
-            ArrivalEstimate estimate = arrivals.get(position);
             ArrivalEstimateView arrival = (ArrivalEstimateView) convertView;
 
-            arrival.setName("Stop name");
-            arrival.setTimeString("Arriving in 10 mins"); // possible NPE
+            String stopId = (String) stops.keySet().toArray()[position];
+            arrival.setName(stops.get(stopId));
+
+            if (stopArrivalMap.get(stopId) == null) {
+                arrival.setTimeString("Unavailable");
+            } else {
+                arrival.setTimeString(Html.fromHtml("Arriving in <b>"
+                        + formatDate((stopArrivalMap.get(stopId)).arrivalAt) + "</b>"));
+            }
 
             return arrival;
         }
@@ -274,7 +314,32 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
         @Override
         public boolean isEmpty() {
-            return getArrivals().isEmpty();
+            return getStops().isEmpty();
+        }
+
+        private String formatDate(String date) {
+            try {
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.ENGLISH);
+                Date result = df.parse(date);
+                long timeFromNow = result.getTime() - Calendar.getInstance().getTime().getTime();
+                int minutes = (int) timeFromNow/1000/60;
+                int hours = minutes/60;
+                int days = hours/24;
+
+                if (minutes >= 0 && minutes < 2) {
+                    return "1 minute";
+                } else if (minutes >= 2 && minutes < 60){
+                    return minutes + " minutes";
+                } else if (minutes >= 60 && hours < 2) {
+                    return "1 hour";
+                } else if (hours >= 2 && hours < 23) {
+                    return  hours + " hours";
+                } else {
+                    return days + " day" + (days > 1 ? "s" : "");
+                }
+            } catch (ParseException e) {
+                return "Unavailable";
+            }
         }
     }
 
