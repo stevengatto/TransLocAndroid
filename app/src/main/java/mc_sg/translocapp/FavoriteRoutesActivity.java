@@ -1,12 +1,17 @@
 package mc_sg.translocapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -52,6 +57,58 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
 
     private List<AgencyRouteMap.Route> favoriteRoutes;
     Map<Integer, Integer> colorMap = new HashMap<>();
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_favorite_routes, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        if (item.getItemId() ==  R.id.reset_favorites) {
+
+            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    switch (which) {
+                        case DialogInterface.BUTTON_POSITIVE:
+                            // clear user preferences
+                            SharedPreferences agencyPrefs = getSharedPreferences(HomeAgencyActivity.PREFS_HOME_AGENCY, MODE_PRIVATE);
+                            SharedPreferences.Editor agencyEditor = agencyPrefs.edit();
+                            agencyEditor.remove(HomeAgencyActivity.KEY_PREFS_AGENCY_ID);
+                            agencyEditor.remove(HomeAgencyActivity.KEY_PREFS_AGENCY_NAME);
+                            agencyEditor.apply();
+
+                            SharedPreferences routesPrefs = getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, MODE_PRIVATE);
+                            SharedPreferences.Editor routesEditor = routesPrefs.edit();
+                            routesEditor.remove(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES);
+                            routesEditor.apply();
+
+                            startActivity(new Intent(context, HomeAgencyActivity.class));
+                            finish();
+                            break;
+                        case DialogInterface.BUTTON_NEGATIVE:
+                            // Do nothing
+                            break;
+                    }
+                }
+            };
+
+            String message = "Are you sure you would like to clear your favorites? " +
+                    "This can't be undone.";
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setMessage(message)
+                    .setPositiveButton("Yes", dialogClickListener)
+                    .setNegativeButton("No", dialogClickListener)
+                    .show();
+            return true;
+        } else {
+            return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

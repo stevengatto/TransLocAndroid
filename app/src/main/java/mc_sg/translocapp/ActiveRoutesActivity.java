@@ -1,5 +1,6 @@
 package mc_sg.translocapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -60,9 +61,19 @@ public class ActiveRoutesActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle item selection
         if (item.getItemId() ==  R.id.favorites_done ) {
-            Intent mapIntent = new Intent(this, FavoriteRoutesActivity.class);
-            startActivity(mapIntent);
-            finish();
+            SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
+            Set<String> routes = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
+
+            if (routes.isEmpty()) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setMessage("You have not selected any routes. Click on the heart to favorite a route!")
+                        .setPositiveButton("OK",null)
+                        .show();
+            } else {
+                Intent mapIntent = new Intent(this, FavoriteRoutesActivity.class);
+                startActivity(mapIntent);
+                finish();
+            }
             return true;
         } else {
             return super.onOptionsItemSelected(item);

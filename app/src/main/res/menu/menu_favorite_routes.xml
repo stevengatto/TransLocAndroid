@@ -2,8 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/favorites_done"
-        android:title="DONE"
-        android:icon="@drawable/ic_check_white_36dp"
-        app:showAsAction="always" />
+        android:id="@+id/reset_favorites"
+        android:title="Reset Favorites"
+        app:showAsAction="never" />
 </menu>
