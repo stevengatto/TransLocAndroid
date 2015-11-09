@@ -2,6 +2,7 @@ package mc_sg.translocapp;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.LinearGradient;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -30,6 +32,7 @@ import com.google.maps.android.PolyUtil;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +56,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
     private HashMap<String,String> segments;
     private GoogleMap map;
     private FloatingActionButton favorite;
-    private CardView cardView;
+    private LinearLayout cardView;
     private ListView stopList;
 
     private ArrayList<Marker> markers = new ArrayList<>();
@@ -78,8 +81,8 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.single_route_map_fragment)).getMapAsync(this);
 
-        cardView = (CardView) findViewById(R.id.single_route_card);
-        cardView.setCardBackgroundColor(color);
+        cardView = (LinearLayout) findViewById(R.id.single_route_card);
+        cardView.setBackgroundColor(color);
 
         favorite = (FloatingActionButton) findViewById(R.id.fab);
         favorite.setOnClickListener(new FavoriteClickListener());
@@ -208,7 +211,15 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
 
         @Override
         public void success(Response<List<ArrivalEstimate>> listResponse, retrofit.client.Response response) {
-            stopList.setAdapter(new ArrivalAdapter(context, listResponse.data));
+            List<ArrivalEstimate> list = new ArrayList<>();
+            list.add(new ArrivalEstimate());
+            list.add(new ArrivalEstimate());
+            list.add(new ArrivalEstimate());
+            list.add(new ArrivalEstimate());
+            list.add(new ArrivalEstimate());
+            list.add(new ArrivalEstimate());
+
+            stopList.setAdapter(new ArrivalAdapter(context, list));
         }
     }
 
@@ -251,8 +262,7 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
             ArrivalEstimateView arrival = (ArrivalEstimateView) convertView;
 
             arrival.setName("Stop name");
-            arrival.setRealTime(estimate.arrivals.get(0).toString()); // possible NPE
-            arrival.setRealTime(estimate.arrivals.get(0).toString()); // possible NPE
+            arrival.setTimeString("Arriving in 10 mins"); // possible NPE
 
             return arrival;
         }

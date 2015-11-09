@@ -246,7 +246,7 @@ public class RoutesActivity extends AppCompatActivity {
             // make sure we get a dark color for the polyline
             if (colorMap.get(position) == null) {
                 while (!isColorDark(currentColor)) {
-                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt()*10) | 0xFF000000;
+                    currentColor = ColorGenerator.MATERIAL.getColor(random.nextInt()*575787) | 0xFF000000;
                 }
                 colorMap.put(position, currentColor);
             } else {
@@ -270,7 +270,7 @@ public class RoutesActivity extends AppCompatActivity {
 
         public boolean isColorDark(int color){
             double darkness = 1-(0.299* Color.red(color) + 0.587*Color.green(color) + 0.114*Color.blue(color))/255;
-            return darkness >= 0.2;
+            return darkness >= 0.3;
         }
     }
 

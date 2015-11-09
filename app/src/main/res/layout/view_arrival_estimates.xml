@@ -1,99 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/transparent"
-    android:padding="16dp">
+    android:background="@drawable/white_border"
+    android:orientation="vertical"
+    android:layout_marginLeft="16dp"
+    android:layout_marginRight="16dp"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:padding="12dp">
 
     <TextView
         android:id="@+id/arr_est_stop_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
         android:layout_alignParentLeft="true"
-        android:layout_marginBottom="16dp"
-        android:fontFamily="sans-serif-thin"
-        android:textSize="38sp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="4dp"
+        android:text="Mass Ave."
         android:textColor="@android:color/white"
-        android:text="Mass Ave."/>
+        android:textSize="24sp"
+        android:singleLine="true"
+        android:maxLines="1"
+        android:ellipsize="marquee"/>
 
     <ImageView
         android:id="@+id/arr_est_clock"
         android:layout_width="36dp"
         android:layout_height="36dp"
         android:layout_below="@id/arr_est_stop_name"
-        android:src="@drawable/ic_schedule_white_36dp"/>
+        android:src="@drawable/ic_schedule_white_36dp" />
 
-    <RelativeLayout
-        android:id="@+id/arr_est_top_layout"
-        android:layout_toRightOf="@id/arr_est_clock"
+    <TextView
+        android:id="@+id/arr_est_time"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
         android:layout_toEndOf="@id/arr_est_clock"
+        android:layout_toRightOf="@id/arr_est_clock"
         android:layout_below="@id/arr_est_stop_name"
-        android:layout_marginLeft="56dp"
-        android:layout_marginStart="56dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:id="@+id/arr_est_real_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="32sp"
-            android:textColor="@android:color/white"
-            android:maxLines="1"
-            android:ellipsize="marquee"
-            android:text="10:45pm"/>
-
-        <TextView
-            android:id="@+id/arr_est_real_time_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/arr_est_real_time"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="italic"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:text="Arriving At"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
-        android:id="@+id/arr_est_bottom_layout"
-        android:layout_toRightOf="@id/arr_est_clock"
-        android:layout_toEndOf="@id/arr_est_clock"
-        android:layout_below="@id/arr_est_top_layout"
-        android:layout_marginLeft="56dp"
-        android:layout_marginStart="56dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp">
-
-        <TextView
-            android:id="@+id/arr_est_time_left"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textStyle="bold"
-            android:textSize="32sp"
-            android:textColor="@android:color/white"
-            android:maxLines="1"
-            android:ellipsize="marquee"
-            android:text="10:45pm"/>
-
-        <TextView
-            android:id="@+id/arr_est_time_left_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/arr_est_time_left"
-            android:fontFamily="sans-serif-light"
-            android:textStyle="italic"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:text="Estimated Arrival" />
-
-    </RelativeLayout>
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:gravity="start|center_vertical"
+        android:ellipsize="marquee"
+        android:maxLines="1"
+        android:text="10:45pm"
+        android:textColor="@android:color/white"
+        android:textSize="18sp"
+        android:textStyle="bold" />
 
 </RelativeLayout>

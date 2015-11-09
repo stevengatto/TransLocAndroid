@@ -14,8 +14,7 @@ public class ArrivalEstimateView extends FrameLayout {
 
     String text;
     TextView tvName;
-    TextView tvRealTime;
-    TextView tvTimeLeft;
+    TextView tvTime;
 
     public ArrivalEstimateView(Context context) {
         this(context, null);
@@ -33,16 +32,12 @@ public class ArrivalEstimateView extends FrameLayout {
 
         // Get our inner views
         tvName = (TextView) view.findViewById(R.id.arr_est_stop_name);
-        tvRealTime = (TextView) view.findViewById(R.id.arr_est_real_time);
-        tvTimeLeft = (TextView) view.findViewById(R.id.arr_est_time_left);
+        tvTime = (TextView) view.findViewById(R.id.arr_est_time);
     }
 
-    public void setTimeLeft(String timeLeft) {
-        tvTimeLeft.setText(timeLeft);
-    }
 
-    public void setRealTime(String realTime) {
-        tvRealTime.setText(realTime);
+    public void setTimeString(String realTime) {
+        tvTime.setText(realTime);
     }
 
     public void setName(String name) {

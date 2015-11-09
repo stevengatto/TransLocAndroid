@@ -4,6 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
+    sothree:umanoDragView="@+id/single_route_info_header"
+    sothree:umanoScrollableView="@+id/single_route_info_list"
     sothree:umanoPanelHeight="68dp"
     sothree:umanoShadowHeight="4dp"
     sothree:umanoParallaxOffset="200dp">
@@ -13,6 +15,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="#ffffff"
         tools:context="mc_sg.translocapp.RouteActivity">
 
         <RelativeLayout
@@ -64,16 +67,79 @@
 
     </android.support.design.widget.CoordinatorLayout>
 
-    <android.support.v7.widget.CardView
+    <LinearLayout
         android:id="@+id/single_route_card"
         android:layout_width="match_parent"
-        android:layout_height="400dp">
+        android:layout_height="500dp"
+        android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/single_route_info_list"
+        <RelativeLayout
+            android:id="@+id/single_route_info_header"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="68dp"
+            android:orientation="vertical">
 
-    </android.support.v7.widget.CardView>
+            <LinearLayout
+                android:id="@+id/single_route_info_dots"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="12dp"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:background="@drawable/small_dot"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginEnd="3dp"/>
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:background="@drawable/small_dot"
+                    android:layout_marginRight="3dp"
+                    android:layout_marginEnd="3dp"/>
+
+                <View
+                    android:layout_width="5dp"
+                    android:layout_height="5dp"
+                    android:background="@drawable/small_dot"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:textColor="@android:color/white"
+                android:textSize="20sp"
+                android:text="ARRIVAL ESTIMATES"/>
+
+        </RelativeLayout>
+
+        <LinearLayout
+            android:id="@+id/single_route_info_list_frame"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:background="@android:color/white"/>
+
+            <ListView
+                android:id="@+id/single_route_info_list"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:clipToPadding="false"
+                android:divider="@null"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
 
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>
