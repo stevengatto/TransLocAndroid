@@ -1,10 +1,8 @@
 <resources>
-    <string name="app_name">TransLocApp</string>
+    <string name="app_name">Bus Hunt</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_active_routes">ActiveRoutesActivity</string>
     <string name="title_activity_favorite_routes">FavoriteRoutesActivity</string>
     <string name="title_activity_home_agency">HomeAgencyActivity</string>
     <string name="title_activity_route">RouteActivity</string>
-
-    <string name="hello_world">Hello world!</string>
 </resources>
