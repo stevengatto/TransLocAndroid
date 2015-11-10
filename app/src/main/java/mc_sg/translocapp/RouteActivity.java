@@ -239,14 +239,18 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         private void createStopArrivalsMap(AgencyVehicleMap vehicleMap) {
             stopArrivalMap.clear();
 
-            for (AgencyVehicleMap.Vehicle vehicle : vehicleMap.getVehicles(agencyId)) {
-                for (AgencyVehicleMap.Vehicle.Estimate estimate : vehicle.arrivalEstimates) {
-                    if (!stopArrivalMap.containsKey(estimate.stopId)) {
-                        stopArrivalMap.put(estimate.stopId, estimate);
-                    } else {
-                        AgencyVehicleMap.Vehicle.Estimate savedEstimate = stopArrivalMap.get(estimate.stopId);
-                        if (savedEstimate.arrivalAt.compareTo(estimate.arrivalAt) == 1) {
-                            stopArrivalMap.put(estimate.stopId, estimate);
+            if (vehicleMap.getVehicles(agencyId) != null) {
+                for (AgencyVehicleMap.Vehicle vehicle : vehicleMap.getVehicles(agencyId)) {
+                    if (vehicle.arrivalEstimates != null) {
+                        for (AgencyVehicleMap.Vehicle.Estimate estimate : vehicle.arrivalEstimates) {
+                            if (!stopArrivalMap.containsKey(estimate.stopId)) {
+                                stopArrivalMap.put(estimate.stopId, estimate);
+                            } else {
+                                AgencyVehicleMap.Vehicle.Estimate savedEstimate = stopArrivalMap.get(estimate.stopId);
+                                if (savedEstimate.arrivalAt.compareTo(estimate.arrivalAt) == 1) {
+                                    stopArrivalMap.put(estimate.stopId, estimate);
+                                }
+                            }
                         }
                     }
                 }
@@ -272,11 +276,15 @@ public class RouteActivity extends AppCompatActivity implements OnMapReadyCallba
         @Override
         public void success(Response<List<Stop>> listResponse, retrofit.client.Response response) {
             stopNames.clear();
-            for (Stop stop : listResponse.data) {
-                for (String routeId : stop.routes) {
-                    // if only the stops for this route, and only add once
-                    if (routeId.equals(route.routeId) && stopNames.get(stop.stopId) == null){
-                        stopNames.put(stop.stopId, stop.name);
+            if (listResponse.data != null) {
+                for (Stop stop : listResponse.data) {
+                    if (stop.routes != null) {
+                        for (String routeId : stop.routes) {
+                            // if only the stops for this route, and only add once
+                            if (routeId.equals(route.routeId) && stopNames.get(stop.stopId) == null) {
+                                stopNames.put(stop.stopId, stop.name);
+                            }
+                        }
                     }
                 }
             }
