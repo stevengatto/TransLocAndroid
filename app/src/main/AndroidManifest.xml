@@ -13,6 +13,7 @@
         <activity
             android:name=".LauncherActivity"
             android:label="@string/app_name"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,21 +29,25 @@
         <activity
             android:name=".ActiveRoutesActivity"
             android:label="@string/title_activity_active_routes"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".FavoriteRoutesActivity"
             android:label="@string/title_activity_favorite_routes"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".HomeAgencyActivity"
             android:label="@string/title_activity_home_agency"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" />
 
         <activity
             android:name=".RouteActivity"
             android:label="@string/title_activity_route"
+            android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar" >
         </activity>
     </application>

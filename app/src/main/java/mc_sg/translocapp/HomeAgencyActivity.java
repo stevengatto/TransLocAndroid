@@ -316,7 +316,6 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
                                     editor.putString(KEY_PREFS_AGENCY_NAME, name);
                                     editor.apply();
                                     startActivity(new Intent(context, ActiveRoutesActivity.class));
-                                    finish();
                                     break;
                                 case DialogInterface.BUTTON_NEGATIVE:
                                     // Do nothing

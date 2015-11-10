@@ -128,13 +128,22 @@ public class ActiveRoutesActivity extends AppCompatActivity {
             SharedPreferences prefs = context.getSharedPreferences(PREFS_FAVORITES, Context.MODE_PRIVATE);
             Set<String> routeIds = prefs.getStringSet(KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
-            for (AgencyRouteMap.Route route : routes) {
-                if (route.isActive) {
-                    activeRoutes.add(route);
-                    ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
-                            new SegmentsCallback(context, route.routeId));
-                    route.following = routeIds.contains(route.routeId);
+            boolean noActive = true;
+            if (routes != null) {
+                for (AgencyRouteMap.Route route : routes) {
+                    if (route.isActive) {
+                        noActive = false;
+                        activeRoutes.add(route);
+                        ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
+                                new SegmentsCallback(context, route.routeId));
+                        route.following = routeIds.contains(route.routeId);
+                    }
                 }
+            }
+
+            if (noActive) {
+                listProgress.setVisibility(View.INVISIBLE);
+                Toast.makeText(context, "There are no active routes at this time.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -221,9 +230,11 @@ public class ActiveRoutesActivity extends AppCompatActivity {
                 editor.putStringSet(KEY_PREFS_FAV_ROUTES, routes);
                 editor.apply();
 
-                for (AgencyRouteMap.Route route : activeRoutes) {
-                    if (route.routeId.equals(routeId)) {
-                        route.following = !route.following;
+                if (activeRoutes != null) {
+                    for (AgencyRouteMap.Route route : activeRoutes) {
+                        if (route.routeId.equals(routeId)) {
+                            route.following = !route.following;
+                        }
                     }
                 }
             }

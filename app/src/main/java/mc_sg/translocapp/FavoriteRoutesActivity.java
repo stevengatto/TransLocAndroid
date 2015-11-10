@@ -172,12 +172,14 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
             SharedPreferences prefs = context.getSharedPreferences(ActiveRoutesActivity.PREFS_FAVORITES, Context.MODE_PRIVATE);
             Set<String> routeIds = prefs.getStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, new HashSet<String>());
 
-            for (AgencyRouteMap.Route route : routes) {
-                if (favRouteIds.contains(route.routeId)) {
-                    favoriteRoutes.add(route);
-                    ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
-                            new SegmentsCallback(context, route.routeId));
-                    route.following = routeIds.contains(route.routeId);
+            if (routes != null) {
+                for (AgencyRouteMap.Route route : routes) {
+                    if (favRouteIds.contains(route.routeId)) {
+                        favoriteRoutes.add(route);
+                        ApiUtil.getTransLocApi().getSegments(agencyId, null, route.routeId,
+                                new SegmentsCallback(context, route.routeId));
+                        route.following = routeIds.contains(route.routeId);
+                    }
                 }
             }
         }
@@ -264,9 +266,11 @@ public class FavoriteRoutesActivity extends AppCompatActivity {
                 editor.putStringSet(ActiveRoutesActivity.KEY_PREFS_FAV_ROUTES, favRouteIds);
                 editor.apply();
 
-                for (AgencyRouteMap.Route route : favoriteRoutes) {
-                    if (route.routeId.equals(routeId)) {
-                        route.following = !route.following;
+                if (favoriteRoutes != null) {
+                    for (AgencyRouteMap.Route route : favoriteRoutes) {
+                        if (route.routeId.equals(routeId)) {
+                            route.following = !route.following;
+                        }
                     }
                 }
             }
