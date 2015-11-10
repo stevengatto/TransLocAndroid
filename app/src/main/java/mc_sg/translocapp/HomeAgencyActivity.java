@@ -354,7 +354,7 @@ public class HomeAgencyActivity extends AppCompatActivity implements OnMapReadyC
             if (map != null) {
                 map.clear();
                 agencyList = listResponse.data;
-                if (!agencyList.isEmpty()) {
+                if (agencyList != null && !agencyList.isEmpty()) {
                     for (Agency agency : agencyList) {
                         map.addMarker(new MarkerOptions()
                             .title(agency.shortName)
