@@ -16,25 +16,20 @@
 #   public *;
 #}
 
-# Retrofit 1.X
--keepattributes Signature,*Annotation*
-
--keep class com.google.gson.** { *; }
--keep class com.google.inject.** { *; }
--keep class org.apache.http.* { *; }
--keep class org.apache.james.mime4j.* { *; }
--keep class javax.inject.** { *; }
+# Retrofit, OkHttp, Gson
+-keepattributes *Annotation*
+-keepattributes Signature
+-keep class com.squareup.okhttp.** { *; }
+-keep interface com.squareup.okhttp.** { *; }
+-dontwarn com.squareup.okhttp.**
 -dontwarn rx.**
--keep class sun.misc.Unsafe { *; }
-
+-dontwarn retrofit.**
 -keep class retrofit.** { *; }
--keep interface retrofit.** { *; }
 -keepclasseswithmembers class * {
     @retrofit.http.* <methods>;
 }
--keepclasseswithmembers class * {
-    @ua.* <methods>;
-}
+-keep class sun.misc.Unsafe { *; }
+-dontwarn java.nio.file.*
 
 # Also you must note that if you are using GSON for conversion from JSON to POJO representation, you must ignore those POJO classes from being obfuscated.
 # Here include the POJO's that have you have created for mapping JSON response to POJO for example.
@@ -44,10 +39,22 @@
 
 -keep class com.google.android.gms.** { *; }
 -dontwarn com.google.android.gms.**
--dontwarn android.support.**
+
+# support-v4
+-dontwarn android.support.v4.**
+-keep class android.support.v4.app.** { *; }
+-keep interface android.support.v4.app.** { *; }
+-keep class android.support.v4.** { *; }
+
+# support-v7
+-dontwarn android.support.v7.**
+-keep class android.support.v7.internal.** { *; }
+-keep interface android.support.v7.internal.** { *; }
+-keep class android.support.v7.** { *; }
 
 -keep class com.squareup.okhttp.** { *; }
 -keep interface com.squareup.okhttp.** { *; }
 -dontwarn com.squareup.okhttp.**
 
+# safe to ignore on android according to docs
 -dontwarn okio.**
